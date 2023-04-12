@@ -1,141 +1,155 @@
 import requests
 import os
 import pathlib
-import pandas  # TODO: change import location
+import pandas
 import json
+import argparse
+import sys
 
-import src.priceCard as priceCard
-import src.rwCsw as rwCsw
+import connect
 
-base_url = "https://api.cardtrader.com/api/v2"
-game = "Magic"
-category = "Single Cards"
-
-database_url = "https://api.scryfall.com"
-
-print("Fetching auth token...")
-# print("auth token env: ", os.getenv("AUTH_TOKEN"))
-if os.getenv("AUTH_TOKEN") != None:
-    auth_token = os.getenv("AUTH_TOKEN")
-    print("...Auth token fetched from environment variables")
-
-else:
-    print("Unable to find auth token!")
-    exit(-1)
-
-headers = {"Authorization": auth_token}
-
-
-def verify_connection():
-    ##Fetch game info
-    response = requests.get(base_url + "/info", headers=headers)
-    if response.status_code == 200:
-        print("...Connection Established!\n")
-    else:
-        print(
-            "Unable to connet to CardTrader API server\nCheck if your API token is still valid!"
-        )
-        exit()
-    # print(response.json())
-
-
-def fetch_local_card_data():
+# Check if configuration exist
+def check_config():
     home_dir = os.getenv("HOME")
     if home_dir == None:
-        print(
+        raise expt.InternalException(
             "Unable to find environment variable named HOME\nplease check if you have defined it"
         )
-        exit()
+    if os.path.exists(home_dir + "/.config/magicscript"):
+        return True
     else:
-        price_csw = pathlib.Path(home_dir + "/.priceCsv/price.csv")
-        file_path = pathlib.Path(home_dir + "/card.csv")
-        if file_path.is_file():
-            print("Card file found!")
+        print(
+            'Unable to fing config file\nConfig script with "--config" flags or use "--config-file"'
+        )
+        return False
+
+
+# Create and populate magicscript config file
+def config_script():
+    check_semantic = False
+    config_map = {}
+    home_dir = os.getenv("HOME")
+    if home_dir == None:
+        raise expt.InternalException(
+            "Unable to find environment variable named HOME\nplease check if you have defined it"
+        )
+    print("Start config script")
+    if os.path.exists(home_dir + "/.config/magicscript") == False:
+        os.mkdir(home_dir + "/.config/magicscript")
+    if os.path.exists(home_dir + "/.config/magicscript/config.yaml") == False:
+        config = open(home_dir + "/.config/magicscript/config.yaml", "x")
+    while check_semantic == False:
+        default_dir = input(
+            "Use default dir [" + home_dir + "/.priceCsv/] for store card info? [Y/n]: "
+        )
+        if default_dir.lower() == "y" or default_dir.lower() == "n":
+            check_semantic = True
         else:
-            print("ERROR: Unable to fin the card file a the default location!")
-            exit()
-        if price_csw.is_file():
-            print("... card price csv file found!")
+            print('Please enter "Y" or "n"')
+    if default_dir.lower() == "n":
+        check_semantic = False
+        while check_semantic == False:
+            config_map["custom_dir"] = input("Enter config path's dir: ")
+            if os.path.exists(config_map["custom_dir"]) == False:
+                print(
+                    'Unable to find dir "'
+                    + config_map["custom_dir"]
+                    + '" check if directory exist and enter it again'
+                )
+            else:
+                check_semantic = True
+    else:
+        config_map["custom_dir"] = home_dir + "/.priceCsv/"
+
+    if os.path.exists(config_map["custom_dir"] + "/.priceCsv"):
+        print('...hidden "priceCsv" dir already exist')
+    else:
+        os.mkdir(config_map["custom_dir"] + "/.priceCsv")
+        print("...Created storage dir")
+
+    f = open(home_dir + "/.config/magicscript/config.yaml", "w")
+    f.write('custom_dir: "' + config_map["custom_dir"] + '"\n')
+
+    # Set output's pdf path
+    check_semantic = False
+    while check_semantic == False:
+        prompt_input = input(
+            "Use default dir [" + home_dir + "] for output's pdf file? [Y/n]: "
+        )
+        if prompt_input.lower() == "y" or prompt_input.lower() == "n":
+            check_semantic = True
         else:
-            price_csw = open(home_dir + "/.priceCsv/price.csv", "x")
-            price_csw.writelines(["name,exp,min_price,max_price,mean_price\n"])
-            price_csw.close()
-            print("... card price csv file created!")
-    return True
+            print('Please enter "Y" or "n"')
 
+    config_map["custom_output"] = home_dir
+    if prompt_input.lower() == "n":
+        check_semantic = False
+        while check_semantic == False:
+            config_map["custom_output"] = input("Enter output's pdf path: ")
+            if os.path.exists(config_map["custom_output"]) == False:
+                print(
+                    'Unable to find dir "'
+                    + config_map["custom_output"]
+                    + '" check if directory exist and enter it again'
+                )
+            else:
+                check_semantic = True
+    f.write('custom_output: "' + config_map["custom_output"] + '"\n')
 
-# TODO: rename module
-def preliminary_action():
-    found_game = False
-    if fetch_local_card_data():
-        response = requests.get(base_url + "/games", headers=headers)
-        # print(response.json()['array'])
-        for elem in response.json()["array"]:
-            if elem["name"] == game:
-                print("Selected game found!")
-                found_game = True
-        if found_game == False:
-            print("ERROR: Unable to find selected Game")
-            exit()
-    return True
+    # Set output's pdf name
+    check_semantic = False
+    while check_semantic == False:
+        prompt_input = input(
+            'Use default name ["PriceRepot.pdf"] for output\'s pdf? [Y/n]: '
+        )
+        if prompt_input.lower() == "y" or prompt_input.lower() == "n":
+            check_semantic = True
+        else:
+            print('Please enter "Y" or "n"')
 
+    config_map["custom_name"] = "PriceRepot.pdf"
+    if prompt_input.lower() == "n":
+        print(
+            "NOTE: If you enter a file's name that already exits it will be overwrite!"
+        )
+        config_map["custom_name"] = input("Enter output's pdf file's name: ")
+    f.write('custom_name: "' + config_map["custom_name"] + '"\n')
 
-def search_for_card(name):
-    blueprint_id = -1
-    expansion_id = -1
-    expansion_name = ""
-
-    card_json = requests.get(database_url + "/cards/named?exact=" + name)
-    if card_json.status_code != 200:
-        exit()
-    scryfall_id = card_json.json()["id"]
-    card_expansion_code = card_json.json()["set"]
-    expansion_code = requests.get(base_url + "/expansions", headers=headers)
-    if expansion_code.status_code != 200:
-        exit()
-
-    print("...Retrived the list of expansions")
-    for elem in expansion_code.json():
-        if elem["code"] == card_expansion_code:
-            if expansion_id > 0:
-                exit()
-            expansion_id = elem["id"]
-            expansion_name = elem["code"]
-            print("...Card code found!")
-    # retrive card blueprint
-
-    card_blueprint = requests.get(
-        base_url + "/blueprints/export?expansion_id=" + str(expansion_id),
-        headers=headers,
+    # set fetch info rate
+    f.write('fetch_rate: "daily"\n')
+    f.close()
+    print(
+        '...Wrote config to "'
+        + home_dir
+        + '/.config/magicscript/config.yaml" directory'
     )
-    if card_blueprint.status_code != 200:
-        print("ERROR: unable to fetch expensions card")
+
+
+if __name__ == "__main__":
+    render = True
+    ext_env = sys.argv
+    # print("env vars: "+str(ext_env))
+
+    if len(ext_env) == 1:
+        if check_config():
+            connect.main()
+
+    elif any(item in sys.argv for item in sys.argv if item == "--help"):
+        print(
+            "Welocome to Magic Script, a python script to scrape and collect info"
+            + " from the famous Card Trader web site!\nThe following is a list of flags"
+            + ' supported by the script:\n - "--quiet": suppress the pdf creation\n -'
+            + ' "--config  ": set the script config\n - "--config-file": pass the config'
+            + " file directly to the script"
+        )
         exit()
 
-    for elem in card_blueprint.json():
-        if elem["name"] == name:
-            if blueprint_id > 0:
-                print("ERROR: two product with the same name found")
-                exit()
-            blueprint_id = elem["id"]
-            print("card found")
+    elif any(item in sys.argv for item in sys.argv if item == "--config"):
+        print("Configurate Magic Script")
+        config_script()
+        exit()
 
-    selled_cards = requests.get(
-        base_url + "/marketplace/products?blueprint_id=" + str(blueprint_id),
-        headers=headers,
-    )
-    tst = list(selled_cards.json().keys())
-
-    print("...feteching prices info")
-    card_price = priceCard.get_prices(selled_cards.json(), tst[0])
-    # print(card_price)
-    rwCsw.write_to_csv(name, expansion_name, card_price)
-
-
-verify_connection()
-if preliminary_action():
-    print("Fetching card info...")
-    csv_file = rwCsw.read_csv()
-    for elem in range(len(csv_file["card"])):
-        if elem == 0:
-            search_for_card(csv_file["card"][elem])
+    elif any(item in sys.argv for item in sys.argv if item == "--quiet"):
+        render = False
+        if check_config():
+            connect.main(render)
