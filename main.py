@@ -102,8 +102,8 @@ def search_for_card(name):
             expansion_id = elem["id"]
             expansion_name = elem["code"]
             print("...Card code found!")
-    # retrive card blueprint
 
+    # retrive card blueprint
     card_blueprint = requests.get(
         base_url + "/blueprints/export?expansion_id=" + str(expansion_id),
         headers=headers,
@@ -118,7 +118,6 @@ def search_for_card(name):
                 print("ERROR: two product with the same name found")
                 exit()
             blueprint_id = elem["id"]
-            print("card found")
 
     selled_cards = requests.get(
         base_url + "/marketplace/products?blueprint_id=" + str(blueprint_id),
@@ -137,5 +136,4 @@ if preliminary_action():
     print("Fetching card info...")
     csv_file = rwCsw.read_csv()
     for elem in range(len(csv_file["card"])):
-        if elem == 0:
-            search_for_card(csv_file["card"][elem])
+        search_for_card(csv_file["card"][elem])
