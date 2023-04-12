@@ -20,6 +20,7 @@ if os.getenv("AUTH_TOKEN") != None:
     print("...Auth token fetched from environment variables")
 
 else:
+    print("test 0")
     raise Exception("Unable to find auth token!")
 
 headers = {"Authorization": auth_token}
@@ -128,5 +129,9 @@ verify_connection()
 if preliminary_action():
     print("Fetching card info...")
     csv_file = rwCsw.read_csv()
-    for elem in range(len(csv_file["card"])):
-        search_for_card(csv_file["card"][elem])
+    try:
+        for elem in range(len(csv_file["card"])):
+            search_for_card(csv_file["card"][elem])
+    except Exception as ex:
+        print(ex)
+        exit()

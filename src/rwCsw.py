@@ -12,9 +12,16 @@ def write_main_dir():
 
 def write_to_csv(name, exp, prices):
     write_main_dir()
-    row_no = search_row(name, "name", "price.csv")
-    home_dir = os.getenv("HOME")
-    price_csv = open(home_dir + "/.priceCsv/price.csv", "a")
+    try:
+        row_no = search_row(name, "name", "price.csv")
+        home_dir = os.getenv("HOME")
+        if home_dir == None:
+            raise Exception("Unable to fine HOME environment variable")
+        price_csv = open(home_dir + "/.priceCsv/price.csv", "a")
+    except Exception as ex:
+        print(ex)
+        exit()
+
     if row_no != -1:
         pandas_csv = pandas.read_csv(home_dir + "/.priceCsv/price.csv")
         pandas_csv.at[row_no, "min_price"] = prices["min_price"]
