@@ -100,7 +100,7 @@ def read_csv():
 def search_row(name, field_name, file_name):
     home_dir = os.getenv("HOME")
     if home_dir == None:
-        exit(-1)
+        raise Exception('Unable to find "HOME" environment variable')
     else:
         csv_file = pandas.read_csv(str(home_dir) + "/.priceCsv/" + file_name)
     index = 0

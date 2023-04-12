@@ -20,8 +20,7 @@ if os.getenv("AUTH_TOKEN") != None:
     print("...Auth token fetched from environment variables")
 
 else:
-    print("Unable to find auth token!")
-    exit(-1)
+    raise Exception("Unable to find auth token!")
 
 headers = {"Authorization": auth_token}
 
@@ -32,28 +31,25 @@ def verify_connection():
     if response.status_code == 200:
         print("...Connection Established!\n")
     else:
-        print(
+        raise Exception(
             "Unable to connet to CardTrader API server\nCheck if your API token is still valid!"
         )
-        exit()
-    # print(response.json())
 
 
 def fetch_local_card_data():
     home_dir = os.getenv("HOME")
     if home_dir == None:
-        print(
+        raise Exception(
             "Unable to find environment variable named HOME\nplease check if you have defined it"
         )
-        exit()
+
     else:
         price_csw = pathlib.Path(home_dir + "/.priceCsv/price.csv")
         file_path = pathlib.Path(home_dir + "/card.csv")
         if file_path.is_file():
             print("Card file found!")
         else:
-            print("ERROR: Unable to fin the card file a the default location!")
-            exit()
+            raise Exception("Unable to fin the card file a the default location!")
         if price_csw.is_file():
             print("... card price csv file found!")
         else:
@@ -75,8 +71,7 @@ def preliminary_action():
                 print("Selected game found!")
                 found_game = True
         if found_game == False:
-            print("ERROR: Unable to find selected Game")
-            exit()
+            raise Exception("Unable to find selected Game")
     return True
 
 
@@ -109,14 +104,12 @@ def search_for_card(name):
         headers=headers,
     )
     if card_blueprint.status_code != 200:
-        print("ERROR: unable to fetch expensions card")
-        exit()
+        raise Exception("unable to fetch expensions card")
 
     for elem in card_blueprint.json():
         if elem["name"] == name:
             if blueprint_id > 0:
-                print("ERROR: two product with the same name found")
-                exit()
+                raise Exception("two product with the same name found")
             blueprint_id = elem["id"]
 
     selled_cards = requests.get(
