@@ -20,7 +20,6 @@ def write_to_csv(name, exp, prices):
             raise Exception("Unable to fine HOME environment variable")
         price_csv = open(home_dir + "/.priceCsv/price.csv", "a")
     except Exception as ex:
-        print("DIOCANE")
         print(ex)
         exit()
 

@@ -82,6 +82,7 @@ if __name__ == "__main__":
                     print(ex)
 
             pdf.generate_pdf_report(csv_file["card"])
+
         except Exception as ex:
             print(ex)
             exit()

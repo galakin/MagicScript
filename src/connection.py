@@ -61,7 +61,6 @@ def search_for_card(name, database_url, base_url, headers):
         base_url + "/marketplace/products?blueprint_id=" + str(blueprint_id),
         headers=headers,
     )
-
     tst = list(selled_cards.json().keys())
 
     print("...fetching prices info")
