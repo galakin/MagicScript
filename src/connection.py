@@ -6,6 +6,7 @@ import json
 
 import src.priceCard as priceCard
 import src.rwCsw as rwCsw
+import src.exceptions as expt
 
 
 def verify_connection(base_url, headers):
@@ -62,7 +63,12 @@ def search_for_card(name, database_url, base_url, headers):
     )
     tst = list(selled_cards.json().keys())
 
-    print("...feteching prices info")
-    card_price = priceCard.get_prices(selled_cards.json(), tst[0])
-    # print(card_price)
-    rwCsw.write_to_csv(name, expansion_name, card_price)
+    print("...fetching prices info")
+    if tst[0] != "error":
+        card_price = priceCard.get_prices(selled_cards.json(), tst[0])
+        # print(card_price)
+        rwCsw.write_to_csv(name, expansion_name, card_price)
+    else:
+        raise expt.InvalidTagException(
+            "Unable to find item with elem_id=", blueprint_id
+        )

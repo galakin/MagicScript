@@ -7,6 +7,8 @@ import json
 import src.priceCard as priceCard
 import src.rwCsw as rwCsw
 import src.connection as nwrk
+import src.pdfManipulation as pdf
+import src.exceptions as expt
 
 base_url = "https://api.cardtrader.com/api/v2"
 game = "Magic"
@@ -68,13 +70,19 @@ def preliminary_action():
 if __name__ == "__main__":
     nwrk.verify_connection(base_url, headers)
     if preliminary_action():
-        print("Fetching card info...")
-        csv_file = rwCsw.read_csv()
         try:
+            print("Fetching card info...")
+            csv_file = rwCsw.read_csv("/card.csv")
             for elem in range(len(csv_file["card"])):
-                nwrk.search_for_card(
-                    csv_file["card"][elem], database_url, base_url, headers
-                )
+                try:
+                    nwrk.search_for_card(
+                        csv_file["card"][elem], database_url, base_url, headers
+                    )
+                except expt.InvalidTagException as ex:
+                    print(ex)
+
+            pdf.generate_pdf_report(csv_file["card"])
+
         except Exception as ex:
             print(ex)
             exit()
