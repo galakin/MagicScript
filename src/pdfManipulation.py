@@ -7,6 +7,7 @@ from matplotlib import rcParams
 import matplotlib.pyplot as plt
 
 import src.rwCsw as rwCsw
+import src.stocks as stocks
 
 
 def fetch_pdf():

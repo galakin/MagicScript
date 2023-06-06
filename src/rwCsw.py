@@ -2,6 +2,8 @@ import os
 import pandas
 from datetime import date
 
+import src.exceptions as expt
+
 
 def write_main_dir():
     home_dir = os.getenv("HOME")
@@ -10,18 +12,68 @@ def write_main_dir():
         os.mkdir(home_dir + "/.priceCsv")
 
 
+def write_stock_csv(name, stocks):
+    print("...write " + str(name) + " stock csv")
+    write_main_dir()
+    home_dir = os.getenv("HOME")
+    if home_dir == None:
+        raise expt.InternalException("Unable to fine HOME environment variable")
+    if not os.path.isfile(
+        home_dir
+        + "/.priceCsv/"
+        + name.lower().replace(" ", "/", name.count(""))
+        + "_stock.csv"
+    ):
+        price_csv = open(
+            home_dir
+            + "/.priceCsv/"
+            + name.lower().replace(" ", "/", name.count(""))
+            + "_stock.csv",
+            "a",
+        )
+        price_csv.writelines(["date,stock,foil,signed_altered\n"])
+        price_csv.close()
+    if (
+        search_row(
+            date.today(),
+            "date",
+            name.lower().replace(" ", "/", name.count("")) + "_stock.csv",
+        )
+        == -1
+    ):
+        price_csv = open(
+            home_dir
+            + "/.priceCsv/"
+            + name.lower().replace(" ", "/", name.count(""))
+            + "_stock.csv",
+            "a",
+        )
+        price_csv.writelines(
+            [
+                str(date.today())
+                + ","
+                + str(stocks["stocks"])
+                + ","
+                + str(stocks["foil"])
+                + ","
+                + str(stocks["signed"])
+                + ","
+                + str(stocks["altered"])
+                + "\n"
+            ]
+        )
+        price_csv.close()
+
+
 def write_to_csv(name, exp, prices):
     print("write data to csv")
     write_main_dir()
-    try:
-        row_no = search_row(name, "name", "price.csv")
-        home_dir = os.getenv("HOME")
-        if home_dir == None:
-            raise Exception("Unable to fine HOME environment variable")
-        price_csv = open(home_dir + "/.priceCsv/price.csv", "a")
-    except Exception as ex:
-        print(ex)
-        exit()
+
+    row_no = search_row(name, "name", "price.csv")
+    home_dir = os.getenv("HOME")
+    if home_dir == None:
+        raise expt.InternalException("Unable to fine HOME environment variable")
+    price_csv = open(home_dir + "/.priceCsv/price.csv", "a")
 
     if row_no != -1:
         pandas_csv = pandas.read_csv(home_dir + "/.priceCsv/price.csv")
