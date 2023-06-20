@@ -7,6 +7,7 @@ import json
 import src.priceCard as priceCard
 import src.rwCsw as rwCsw
 import src.exceptions as expt
+import src.stocks as stocks
 
 
 def verify_connection(base_url, headers):
@@ -15,7 +16,7 @@ def verify_connection(base_url, headers):
     if response.status_code == 200:
         print("...Connection Established!\n")
     else:
-        raise Exception(
+        raise expt.InternalException(
             "Unable to connet to CardTrader API server\nCheck if your API token is still valid!"
         )
 
@@ -49,24 +50,26 @@ def search_for_card(name, database_url, base_url, headers):
         headers=headers,
     )
     if card_blueprint.status_code != 200:
-        raise Exception("unable to fetch expensions card")
+        raise expt.InternalException("unable to fetch expensions card")
 
     for elem in card_blueprint.json():
         if elem["name"] == name:
             if blueprint_id > 0:
-                raise Exception("two product with the same name found")
+                raise expt.InternalException("two product with the same name found")
             blueprint_id = elem["id"]
 
     selled_cards = requests.get(
         base_url + "/marketplace/products?blueprint_id=" + str(blueprint_id),
         headers=headers,
     )
+
     tst = list(selled_cards.json().keys())
 
     print("...fetching prices info")
     if tst[0] != "error":
         card_price = priceCard.get_prices(selled_cards.json(), tst[0])
-        # print(card_price)
+        stocks.finds_stocks(selled_cards.json(), blueprint_id)
+
         rwCsw.write_to_csv(name, expansion_name, card_price)
     else:
         raise expt.InvalidTagException(

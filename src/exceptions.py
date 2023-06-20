@@ -1,8 +1,13 @@
 class InvalidTagException(Exception):
-    "Unable to find item with selected tag"
+    print("Unable to find item with selected tag")
     pass
 
 
 class InvalidDir(Exception):
-    "Unable to find directory"
+    print("Unable to find directory")
+    pass
+
+
+class InternalException(Exception):
+    print("Print generic internal exception")
     pass

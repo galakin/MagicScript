@@ -9,6 +9,7 @@ import src.rwCsw as rwCsw
 import src.connection as nwrk
 import src.pdfManipulation as pdf
 import src.exceptions as expt
+import src.exceptions as expt
 
 base_url = "https://api.cardtrader.com/api/v2"
 game = "Magic"
@@ -23,7 +24,7 @@ if os.getenv("AUTH_TOKEN") != None:
     print("...Auth token fetched from environment variables")
 
 else:
-    raise Exception("Unable to find auth token!")
+    raise expt.InternalException("Unable to find auth token!")
 
 headers = {"Authorization": auth_token}
 
@@ -31,7 +32,7 @@ headers = {"Authorization": auth_token}
 def fetch_local_card_data():
     home_dir = os.getenv("HOME")
     if home_dir == None:
-        raise Exception(
+        raise expt.InternalException(
             "Unable to find environment variable named HOME\nplease check if you have defined it"
         )
 
@@ -41,7 +42,9 @@ def fetch_local_card_data():
         if file_path.is_file():
             print("Card file found!")
         else:
-            raise Exception("Unable to fin the card file a the default location!")
+            raise expt.InternalException(
+                "Unable to fin the card file a the default location!"
+            )
         if price_csw.is_file():
             print("... card price csv file found!")
         else:
@@ -63,7 +66,7 @@ def preliminary_action():
                 print("Selected game found!")
                 found_game = True
         if found_game == False:
-            raise Exception("Unable to find selected Game")
+            raise expt.InternalException("Unable to find selected Game")
     return True
 
 
@@ -83,6 +86,6 @@ if __name__ == "__main__":
 
             pdf.generate_pdf_report(csv_file["card"])
 
-        except Exception as ex:
+        except expt.InternalException as ex:
             print(ex)
             exit()

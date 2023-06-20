@@ -17,7 +17,7 @@ def get_prices(seller_list, item_tag):
             "max_price": max_price,
             "mean_price": mean_price,
         }
-    except Exception as ex:
+    except Eexpt.InternalException as ex:
         print(ex)
         print("env, item_tag: ", item_tag)
         print("seller list: " + str(seller_list[item_tag][0]))
