@@ -10,14 +10,7 @@ import src.rwCsw as rwCsw
 import src.stocks as stocks
 
 
-def fetch_pdf():
-    print("...Fetch pdf!")
-    # fetching price dataframe
-
-
 def generate_pdf_report(csv_file):
-    # print("\n"+str(csv_dir)+"\n")
-    fetch_pdf()
     home_dir = os.getenv("HOME")
     pdf = PDF()
     pdf.generate_file(csv_file)
@@ -69,6 +62,7 @@ class PDF(fpdf.FPDF):
         is_first_page = True
         for elem in csv_file:
             self.generate_graph(elem, is_first_page)
+            self.generate_stocks_page(elem)
             self.add_page()
             if is_first_page == True:
                 is_first_page = False
@@ -80,7 +74,6 @@ class PDF(fpdf.FPDF):
             )
             exit(-1)
         self.cell(60, 10, "Price for " + str(elem), 0, 1)
-        self.set_font("Arial", "I", 6)
         self.image(images[0], 15, 65, self.WIDTH - 30)
         self.image(images[1], 15, self.WIDTH / 2 + 35, self.WIDTH - 30)
         self.image(images[2], 15, self.WIDTH, self.WIDTH - 30)
@@ -95,11 +88,71 @@ class PDF(fpdf.FPDF):
                 "Unable to find the correct no of graph images during PDF cretion!"
             )
             exit(-1)
-        self.cell(60, 10, "Price for " + str(elem), 0, 1)
-        # self.cell()
-        self.image(images[0], 15, 50, self.WIDTH - 30)
-        self.image(images[1], 15, self.WIDTH / 2 + 25, self.WIDTH - 30)
-        self.image(images[2], 15, self.WIDTH, self.WIDTH - 30)
+        if len(images) == 3:
+            self.cell(60, 10, "Price for " + str(elem), 0, 1)
+            # self.cell()
+            self.image(images[0], 15, 50, self.WIDTH - 30)
+            self.image(images[1], 15, self.WIDTH / 2 + 25, self.WIDTH - 30)
+            self.image(images[2], 15, self.WIDTH, self.WIDTH - 30)
+        elif len(images) == 4:
+            self.cell(60, 10, str(elem) + " stocks", 0, 1)
+            self.image(images[0], x=15, y=50, w=self.WIDTH - 80)
+            self.image(images[1], 15, (self.WIDTH / 2) - 2, w=self.WIDTH - 80)
+            self.image(images[2], 15, self.WIDTH - 50, self.WIDTH - 80)
+            self.image(images[3], 15, self.WIDTH + 5, self.WIDTH - 80)
+
+    def generate_stocks_page(self, elem):
+        # Add new page to avoid graph collision
+        self.add_page()
+        print("...Generate " + elem + " stock page")
+        home_dir = os.getenv("HOME")
+        price_csw = rwCsw.read_csv(
+            "/.priceCsv/"
+            + str(elem).lower().replace(" ", "/", elem.count(""))
+            + "_stock.csv"
+        )
+
+        for list_elem in ["stock", "foil", "signed", "altered"]:
+
+            # general stock graph
+            xaxis = price_csw["date"]
+            yaxis = price_csw[list_elem]
+
+            plt.figure(figsize=(12, 4))
+            plt.grid(color="#F2F2F2", alpha=1, zorder=0)
+            plt.plot(xaxis, yaxis)
+
+            # TODO check dir
+            name = (
+                home_dir
+                + "/.priceCsv/images/"
+                + str(elem).lower().replace(" ", "/", elem.count(""))
+            )
+            if os.path.isdir(home_dir + "/.priceCsv/images/") == False:
+                raise Exception(
+                    "Unable to find directory with name: "
+                    + str(home_dir + "/.priceCsv/images/")
+                )
+                exit(-1)
+
+            plt.title(elem + " " + list_elem + " stock")
+            plt.savefig(
+                name + "_" + list_elem + ".png",
+                dpi=300,
+                bbox_inches="tight",
+                pad_inches=0,
+            )
+            plt.close()
+
+        self.page_body(
+            [
+                name + "_stock.png",
+                name + "_foil.png",
+                name + "_signed.png",
+                name + "_altered.png",
+            ],
+            elem,
+        )
 
     def generate_graph(self, elem, is_first_page):
         # TODO: add expension code eg 'ONE'

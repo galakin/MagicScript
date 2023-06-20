@@ -31,16 +31,14 @@ def write_stock_csv(name, stocks):
             + "_stock.csv",
             "a",
         )
-        price_csv.writelines(["date,stock,foil,signed_altered\n"])
+        price_csv.writelines(["date,stock,foil,signed,altered\n"])
         price_csv.close()
-    if (
-        search_row(
-            date.today(),
-            "date",
-            name.lower().replace(" ", "/", name.count("")) + "_stock.csv",
-        )
-        == -1
-    ):
+    row_found = search_row(
+        date.today(),
+        "date",
+        name.lower().replace(" ", "/", name.count("")) + "_stock.csv",
+    )
+    if row_found == -1:
         price_csv = open(
             home_dir
             + "/.priceCsv/"
@@ -157,14 +155,22 @@ def read_csv(path):
     return csv_file
 
 
-def search_row(name, field_name, file_name):
+def search_row(name, field_name, file_name, log=False):
+    if log == True:
+        print("name field: " + str(name))
     home_dir = os.getenv("HOME")
     if home_dir == None:
-        raise Exception('Unable to find "HOME" environment variable')
+        raise expt.InternalException('Unable to find "HOME" environment variable')
+        # TODO add print path values
     else:
         csv_file = pandas.read_csv(str(home_dir) + "/.priceCsv/" + file_name)
+        # if log == True: print(csv_file)
     index = 0
+    if log == True:
+        print("range lenght: " + str(len(csv_file[field_name])))
     for elem in range(len(csv_file[field_name])):
+        if log:
+            print(str(csv_file[field_name][elem]) + " == " + str(name))
         if str(csv_file[field_name][elem]) == str(name):
             return index
         index += 1

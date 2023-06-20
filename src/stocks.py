@@ -33,9 +33,3 @@ def finds_stocks(selled_cards, blueprint_id):
             "altered": alter_stock,
         },
     )
-
-    # for elem in selled_cards[blueprint_id]:
-    #    None
-    # min_price = [0]
-
-    # print(blueprint_id)
