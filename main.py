@@ -3,6 +3,7 @@ import os
 import pathlib
 import pandas
 import json
+import argparse
 
 import src.priceCard as priceCard
 import src.rwCsw as rwCsw
@@ -84,7 +85,7 @@ if __name__ == "__main__":
                 except expt.InvalidTagException as ex:
                     print(ex)
 
-            pdf.generate_pdf_report(csv_file["card"])
+            pdf.generate_pdf_report(csv_file["card"], render=True)
 
         except expt.InternalException as ex:
             print(ex)
