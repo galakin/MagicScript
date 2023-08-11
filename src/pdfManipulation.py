@@ -9,6 +9,7 @@ import matplotlib.pyplot as plt
 import src.rwCsw as rwCsw
 import src.stocks as stocks
 import src.dateRender as drender
+import src.cardInfo as cardInfo
 
 
 def generate_pdf_report(csv_file, render=True):
@@ -59,6 +60,7 @@ class PDF(fpdf.FPDF):
         self.cell(60, 10, "Report of cards prices", 0, 1)
         self.cell(60, 10, "Price updatae at: " + str(date.today()), 0, 1)
 
+        # if render :
         home_dir = os.getenv("HOME")
         if os.path.exists(home_dir + "/.priceCsv/images") == False:
             os.mkdir(home_dir + "/.priceCsv/images")
@@ -66,6 +68,7 @@ class PDF(fpdf.FPDF):
         for elem in csv_file:
             self.generate_graph(elem, is_first_page)
             self.generate_stocks_page(elem)
+            cardInfo.generate_info(elem, self)
             self.add_page()
             if is_first_page == True:
                 is_first_page = False
