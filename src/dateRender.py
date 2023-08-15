@@ -21,17 +21,13 @@ def render_prices_month(path, list_elem):
         data[elem] = []
     first_elem, elem_delta = 0, 0
     for elem in range(len(csv_file["date"])):
-        # print("elem is: "+str(elem))
         csv_date = datetime.datetime.strptime(csv_file["date"][elem], "%Y-%m-%d").date()
         if time_range < csv_date:
 
             valid_date_no += 1
             tmp_dict = csv_file.iloc[[elem]].to_dict()
             if len(tmp_dict["date"].keys()) == 1 and first_elem == 0:
-                # print(tmp_dict['date'].keys())
                 first_elem = list(tmp_dict["date"].keys())[0]
-
-            # TODO check if map index start from 0
 
             if valid_date.empty:
                 for index in range(len(list_elem)):
@@ -45,10 +41,9 @@ def render_prices_month(path, list_elem):
                         first_elem
                     )
                 valid_date.loc[len(valid_date.index)] = data
-            # print(tmp_dict)
             first_elem += 1
 
-    print("valid date: " + str(len(valid_date.index)))
+    # print("valid date: " + str(len(valid_date.index)))
 
     return valid_date
 
@@ -93,8 +88,6 @@ def render_stock_month(path):
                     "altered": altered,
                 }
 
-            # print(tmp_dict)
-
-    print("valid date: " + str(len(valid_date.index)))
+    # print("valid date: " + str(len(valid_date.index)))
 
     return valid_date
