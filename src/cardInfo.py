@@ -10,6 +10,7 @@ import matplotlib.pyplot as plt
 import src.rwCsw as rwCsw
 import src.stocks as stocks
 import src.dateRender as drender
+import global_var
 
 
 def generate_info(name, pdf):
@@ -17,7 +18,7 @@ def generate_info(name, pdf):
 
     # retrive info for card stock
     filter_stock_csw = drender.render_stock_month(
-        "/.priceCsv/"
+        global_var.custom_dir
         + str(name).lower().replace(" ", "/", name.count(""))
         + "_stock.csv"
     )
@@ -38,7 +39,7 @@ def generate_info(name, pdf):
 
     # retrive info for card prices
     filter_price_csw = drender.render_prices_month(
-        "/.priceCsv/"
+        global_var.custom_dir
         + str(name).lower().replace(" ", "/", name.count(""))
         + "_price.csv",
         ["date", "min_price", "max_price", "mean_price"],
