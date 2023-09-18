@@ -149,7 +149,7 @@ def write_card_price_csv(name, prices):
 def read_csv(path):
     home_dir = os.getenv("HOME")
     if home_dir != None:
-        csv_file = pandas.read_csv("/home/jacopopela" + path)
+        csv_file = pandas.read_csv(path)
     else:
         csv_file = pandas.read_csv(str(home_dir) + path)
     return csv_file

@@ -10,6 +10,7 @@ import src.rwCsw as rwCsw
 import src.stocks as stocks
 import src.dateRender as drender
 import src.cardInfo as cardInfo
+import global_var
 
 
 def generate_pdf_report(csv_file, render=True):
@@ -20,12 +21,13 @@ def generate_pdf_report(csv_file, render=True):
     rcParams["axes.spines.top"] = False
     rcParams["axes.spines.right"] = False
 
-    if home_dir != None:
-        pdf.output("/home/jacopopela/PriceRepot.pdf", "F")
-        print("PDF created at index: /home/jacopopela/PriceRepot.pdf")
-    else:
-        pdf.output(str(home_dir) + "/PriceRepot.pdf", "F")
-        print("PDF created at index: ", str(home_dir) + "/PriceRepot.pdf")
+    pdf.output(global_var.custom_output + "/" + global_var.custom_name, "F")
+    print(
+        "PDF created at index: "
+        + global_var.custom_output
+        + "/"
+        + global_var.custom_name
+    )
 
 
 class PDF(fpdf.FPDF):
@@ -62,8 +64,8 @@ class PDF(fpdf.FPDF):
 
         # if render :
         home_dir = os.getenv("HOME")
-        if os.path.exists(home_dir + "/.priceCsv/images") == False:
-            os.mkdir(home_dir + "/.priceCsv/images")
+        if os.path.exists(global_var.custom_dir + "/images") == False:
+            os.mkdir(global_var.custom_dir + "/images")
         is_first_page = True
         for elem in csv_file:
             self.generate_graph(elem, is_first_page)
@@ -113,7 +115,7 @@ class PDF(fpdf.FPDF):
         print("...Generate " + elem + " stock page")
         home_dir = os.getenv("HOME")
         filter_price_csw = drender.render_stock_month(
-            "/.priceCsv/"
+            global_var.custom_dir
             + str(elem).lower().replace(" ", "/", elem.count(""))
             + "_stock.csv"
         )
@@ -130,8 +132,8 @@ class PDF(fpdf.FPDF):
 
             # TODO check dir
             name = (
-                home_dir
-                + "/.priceCsv/images/"
+                global_var.custom_dir
+                + "/images/"
                 + str(elem).lower().replace(" ", "/", elem.count(""))
             )
             if os.path.isdir(home_dir + "/.priceCsv/images/") == False:
@@ -166,14 +168,14 @@ class PDF(fpdf.FPDF):
         home_dir = os.getenv("HOME")
 
         filter_price_csw = drender.render_prices_month(
-            "/.priceCsv/"
+            global_var.custom_dir
             + str(elem).lower().replace(" ", "/", elem.count(""))
             + "_price.csv",
             ["date", "min_price", "max_price", "mean_price"],
         )
 
         price_csw = rwCsw.read_csv(
-            "/.priceCsv/"
+            global_var.custom_dir
             + str(elem).lower().replace(" ", "/", elem.count(""))
             + "_price.csv"
         )
@@ -192,14 +194,14 @@ class PDF(fpdf.FPDF):
 
             # TODO check dir
             name = (
-                home_dir
-                + "/.priceCsv/images/"
+                global_var.custom_dir
+                + "/images/"
                 + str(elem).lower().replace(" ", "/", elem.count(""))
             )
-            if os.path.isdir(home_dir + "/.priceCsv/images/") == False:
+            if os.path.isdir(global_var.custom_dir + "/images/") == False:
                 raise expt.InternalException(
                     "Unable to find directory with name: "
-                    + str(home_dir + "/.priceCsv/images/")
+                    + str(global_var.custom_dir + "//images/")
                 )
                 exit(-1)
 

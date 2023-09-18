@@ -11,7 +11,7 @@ def render_prices_month(path, list_elem):
     delta = datetime.timedelta(days=30)
     time_range = tod - delta
 
-    csv_file = pandas.read_csv("/home/jacopopela" + path)
+    csv_file = pandas.read_csv(path)
 
     valid_date_no = 0
     valid_date = pandas.DataFrame()
@@ -54,7 +54,7 @@ def render_stock_month(path):
     delta = datetime.timedelta(days=30)
     time_range = tod - delta
 
-    csv_file = pandas.read_csv("/home/jacopopela" + path)
+    csv_file = pandas.read_csv(path)
 
     valid_date_no = 0
     valid_date = pandas.DataFrame()
