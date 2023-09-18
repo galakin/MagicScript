@@ -121,10 +121,12 @@ def generate_info(name, pdf):
     pdf.cell(
         60, 0, "Delta of foil cards: \t\t" + str(result["delta_foil"]) + " units", 0, 1
     )
+    # print("delta's foil: "+str(result["delta_foil"]))
     if result["delta_foil"] < 0:
         result["percentage_foil"] = round(result["percentage_foil"], 2) - 100
     elif result["delta_foil"] >= 0:
-        result["percentage_foil"] = 100 - round(result["percentage_foil"], 2)
+        print(round(result["percentage_foil"], 2))
+        result["percentage_foil"] = round(result["percentage_foil"], 2) - 100
     pdf.cell(
         60,
         10,
