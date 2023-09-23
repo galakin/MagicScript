@@ -10,13 +10,14 @@ import yaml
 import src.priceCard as priceCard
 import src.rwCsw as rwCsw
 import src.connection as nwrk
+
 import src.pdfManipulation as pdf
 import src.exceptions as expt
 import global_var
 
 base_url = "https://api.cardtrader.com/api/v2"
 game = "Magic"
-category = "Single Cards"
+# category = "Single Cards"
 
 database_url = "https://api.scryfall.com"
 
@@ -38,6 +39,7 @@ def fetch_local_card_data():
         raise expt.InternalException(
             "Unable to find environment variable named HOME\nplease check if you have defined it"
         )
+        return False
 
     price_csw = pathlib.Path(global_var.custom_dir + "/price.csv")
     file_path = pathlib.Path(home_dir + "/card.csv")
@@ -47,6 +49,7 @@ def fetch_local_card_data():
         raise expt.InternalException(
             "Unable to fin the card file a the default location!"
         )
+        return False
     if price_csw.is_file():
         print("... card price csv file found!")
     else:
@@ -64,6 +67,7 @@ def preliminary_action():
         raise expt.InternalException(
             "Unable to find environment variable named HOME\nplease check if you have defined it"
         )
+        return False
 
     else:
         if global_var.custom_dir == "":
@@ -74,7 +78,6 @@ def preliminary_action():
                     global_var.custom_dir = config["custom_dir"]
                     global_var.custom_output = config["custom_output"]
                     global_var.custom_name = config["custom_name"]
-                    print(global_var.custom_dir)
                 except yaml.YAMLError as e:
                     print(e)
     found_game = False
@@ -87,15 +90,20 @@ def preliminary_action():
                 found_game = True
         if found_game == False:
             raise expt.InternalException("Unable to find selected Game")
+            return False
     return True
 
 
 def main(render=True):
     nwrk.verify_connection(base_url, headers)
     home_dir = os.getenv("HOME")
-    if preliminary_action():
+    result = preliminary_action()
+    print(result)
+    if result:
+        print("finished prelim action")
         try:
             print("Fetching card info...")
+            # TODO change card csv file
             csv_file = rwCsw.read_csv(home_dir + "/card.csv")
             for elem in range(len(csv_file["card"])):
                 try:
@@ -108,5 +116,6 @@ def main(render=True):
             pdf.generate_pdf_report(csv_file["card"], render=render)
 
         except expt.InternalException as ex:
+            print("unexpected error")
             print(ex)
             exit()

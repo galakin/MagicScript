@@ -1,0 +1,29 @@
+name: Test Connection
+
+on:
+  push:
+    branches:
+      - test
+      - main
+  pull_request:
+    # Sequence of patterns matched against refs/heads
+    branches:
+      - test
+      - main
+jobs:
+  test-connection:
+    name: Test connection
+    runs-on: ubuntu-latest
+    container:
+      image: python:3.9.18
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+      - name: Run a one-line script
+        run: echo "Test script connection"
+      - name: Export Auth token
+        run: export $AUTH_TOKEN
+      - name: Run Python test
+        run: |
+          pip install -r requirement.txt
+          pytest test/test.py
