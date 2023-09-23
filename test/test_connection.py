@@ -13,6 +13,7 @@ successfull_test = 0
 
 def test_connection():
     tst = test_verify_connection()
+    global total_test, successfull_test
     total_test += tst[0]
     successfull_test += tst[1]
     return {"total": total_test, "successfull": successfull_test}
