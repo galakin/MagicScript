@@ -1,0 +1,6 @@
+requests
+pandas
+fpdf
+matplotlib
+pytest
+PyYAML

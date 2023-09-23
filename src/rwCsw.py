@@ -18,6 +18,7 @@ def write_stock_csv(name, stocks):
     home_dir = os.getenv("HOME")
     if home_dir == None:
         raise expt.InternalException("Unable to fine HOME environment variable")
+    # TODO: add custom dir
     if not os.path.isfile(
         home_dir
         + "/.priceCsv/"
@@ -69,6 +70,7 @@ def write_to_csv(name, exp, prices):
 
     row_no = search_row(name, "name", "price.csv")
     home_dir = os.getenv("HOME")
+    # TODO: add custom dir
     if home_dir == None:
         raise expt.InternalException("Unable to fine HOME environment variable")
     price_csv = open(home_dir + "/.priceCsv/price.csv", "a")
@@ -78,6 +80,15 @@ def write_to_csv(name, exp, prices):
         pandas_csv.at[row_no, "min_price"] = prices["min_price"]
         pandas_csv.at[row_no, "max_price"] = prices["max_price"]
         pandas_csv.at[row_no, "mean_price"] = prices["mean_price"]
+        pandas_csv.at[row_no, "foil_min_price"] = prices["foil_min_price"]
+        pandas_csv.at[row_no, "foil_max_price"] = prices["foil_max_price"]
+        pandas_csv.at[row_no, "foil_mean_price"] = prices["foil_mean_price"]
+        pandas_csv.at[row_no, "signed_min_price"] = prices["signed_min_price"]
+        pandas_csv.at[row_no, "signed_max_price"] = prices["signed_max_price"]
+        pandas_csv.at[row_no, "signed_mean_price"] = prices["signed_mean_price"]
+        pandas_csv.at[row_no, "altered_min_price"] = prices["altered_min_price"]
+        pandas_csv.at[row_no, "altered_max_price"] = prices["altered_max_price"]
+        pandas_csv.at[row_no, "altered_mean_price"] = prices["altered_mean_price"]
         pandas_csv.to_csv(home_dir + "/.priceCsv/price.csv", index=False)
 
     else:
@@ -92,6 +103,24 @@ def write_to_csv(name, exp, prices):
                 + str(prices["max_price"])
                 + ","
                 + str(prices["mean_price"])
+                + ","
+                + str(prices["foil_min_price"])
+                + ","
+                + str(prices["foil_max_price"])
+                + ","
+                + str(prices["foil_mean_price"])
+                + ","
+                + str(prices["signed_min_price"])
+                + ","
+                + str(prices["signed_max_price"])
+                + ","
+                + str(prices["signed_mean_price"])
+                + ","
+                + str(prices["altered_min_price"])
+                + ","
+                + str(prices["altered_max_price"])
+                + ","
+                + str(prices["altered_mean_price"])
                 + "\n"
             ]
         )
@@ -99,6 +128,7 @@ def write_to_csv(name, exp, prices):
     write_card_price_csv(name, prices)
 
 
+# BUG: there is a bug here!
 def write_card_price_csv(name, prices):
     home_dir = os.getenv("HOME")
     if not os.path.isfile(
@@ -114,7 +144,15 @@ def write_card_price_csv(name, prices):
             + "_price.csv",
             "a",
         )
-        price_csv.writelines(["date,min_price,max_price,mean_price\n"])
+        price_csv.writelines(
+            [
+                "date,min_price,max_price,mean_price,"
+                + "foil_min_price,foil_max_price,foil_mean_price,"
+                + "signed_min_price,signed_max_price,signed_mean_price,"
+                + "altered_min_price,altered_max_price,altered_mean_price,"
+                + "\n"
+            ]
+        )
         price_csv.close()
     if (
         search_row(
@@ -140,6 +178,24 @@ def write_card_price_csv(name, prices):
                 + str(prices["max_price"])
                 + ","
                 + str(prices["mean_price"])
+                + ","
+                + str(prices["foil_min_price"])
+                + ","
+                + str(prices["foil_max_price"])
+                + ","
+                + str(prices["foil_mean_price"])
+                + ","
+                + str(prices["signed_min_price"])
+                + ","
+                + str(prices["signed_max_price"])
+                + ","
+                + str(prices["signed_mean_price"])
+                + ","
+                + str(prices["altered_min_price"])
+                + ","
+                + str(prices["altered_max_price"])
+                + ","
+                + str(prices["altered_mean_price"])
                 + "\n"
             ]
         )
@@ -156,22 +212,19 @@ def read_csv(path):
 
 
 def search_row(name, field_name, file_name, log=False):
-    if log == True:
-        print("name field: " + str(name))
     home_dir = os.getenv("HOME")
     if home_dir == None:
         raise expt.InternalException('Unable to find "HOME" environment variable')
         # TODO add print path values
     else:
         csv_file = pandas.read_csv(str(home_dir) + "/.priceCsv/" + file_name)
-        # if log == True: print(csv_file)
+
     index = 0
     if log == True:
         print("range lenght: " + str(len(csv_file[field_name])))
     for elem in range(len(csv_file[field_name])):
-        if log:
-            print(str(csv_file[field_name][elem]) + " == " + str(name))
         if str(csv_file[field_name][elem]) == str(name):
+
             return index
         index += 1
     return -1

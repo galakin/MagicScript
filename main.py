@@ -36,8 +36,6 @@ def config_script():
     print("Start config script")
     if os.path.exists(home_dir + "/.config/magicscript") == False:
         os.mkdir(home_dir + "/.config/magicscript")
-    if os.path.exists(home_dir + "/.config/magicscript/config.yaml") == False:
-        config = open(home_dir + "/.config/magicscript/config.yaml", "x")
     while check_semantic == False:
         default_dir = input(
             "Use default dir [" + home_dir + "/.priceCsv/] for store card info? [Y/n]: "
@@ -64,7 +62,7 @@ def config_script():
     if os.path.exists(config_map["custom_dir"] + "/.priceCsv"):
         print('...hidden "priceCsv" dir already exist')
     else:
-        os.mkdir(config_map["custom_dir"] + "/.priceCsv")
+        os.mkdir(config_map["custom_dir"])
         print("...Created storage dir")
 
     f = open(home_dir + "/.config/magicscript/config.yaml", "w")
