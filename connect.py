@@ -10,13 +10,14 @@ import yaml
 import src.priceCard as priceCard
 import src.rwCsw as rwCsw
 import src.connection as nwrk
+
 import src.pdfManipulation as pdf
 import src.exceptions as expt
 import global_var
 
 base_url = "https://api.cardtrader.com/api/v2"
 game = "Magic"
-category = "Single Cards"
+# category = "Single Cards"
 
 database_url = "https://api.scryfall.com"
 
@@ -96,6 +97,7 @@ def main(render=True):
     if preliminary_action():
         try:
             print("Fetching card info...")
+            # TODO change card csv file
             csv_file = rwCsw.read_csv(home_dir + "/card.csv")
             for elem in range(len(csv_file["card"])):
                 try:
