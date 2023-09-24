@@ -3,9 +3,9 @@ class InvalidTagException(Exception):
     pass
 
 
-class InvalidDir(Exception):
-    # print("Unable to find directory")
-    pass
+# class InvalidDir(Exception):
+#    # print("Unable to find directory")
+#    pass
 
 
 class InternalException(Exception):
