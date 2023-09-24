@@ -36,11 +36,9 @@ def config_script():
     print("Start config script")
     if os.path.exists(home_dir + "/.config/magicscript") == False:
         os.mkdir(home_dir + "/.config/magicscript")
-    if os.path.exists(home_dir + "/.config/magicscript/config.yaml") == False:
-        config = open(home_dir + "/.config/magicscript/config.yaml", "x")
     while check_semantic == False:
         default_dir = input(
-            "Use default dir [" + home_dir + "/.priceCsv/] for store card info? [Y/n]: "
+            'Use default dir [" + home_dir + "/.priceCsv/] for store card info? [Y/n]: '
         )
         if default_dir.lower() == "y" or default_dir.lower() == "n":
             check_semantic = True

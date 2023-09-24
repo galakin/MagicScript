@@ -14,7 +14,6 @@ import global_var
 
 
 def generate_pdf_report(csv_file, render=True):
-    home_dir = os.getenv("HOME")
     pdf = PDF()
     pdf.generate_file(csv_file, render)
 
@@ -37,23 +36,6 @@ class PDF(fpdf.FPDF):
         self.HEIGHT = 297
         self.render = True
 
-    def header(self):
-        # Custom logo and positioning
-        # Create an `assets` folder and put any wide and short image inside
-        # Name the image `logo.png`
-        self.set_font("Arial", "B", 11)
-        self.cell(self.WIDTH - 80)
-        self.cell(60, 1, "Price report", 0, 0, "R")
-
-        self.ln(20)
-
-    def footer(self):
-        # Page numbers in the footer
-        self.set_y(-15)
-        self.set_font("Arial", "I", 8)
-        self.set_text_color(128)
-        self.cell(0, 10, "Page " + str(self.page_no()), 0, 0, "C")
-
     def generate_file(self, csv_file, render):
         # Generates the report
         self.render = render
@@ -63,7 +45,6 @@ class PDF(fpdf.FPDF):
         self.cell(60, 10, "Price updatae at: " + str(date.today()), 0, 1)
 
         # if render :
-        home_dir = os.getenv("HOME")
         if os.path.exists(global_var.custom_dir + "/images") == False:
             os.mkdir(global_var.custom_dir + "/images")
         is_first_page = True
@@ -85,10 +66,6 @@ class PDF(fpdf.FPDF):
         self.image(images[0], 15, 65, self.WIDTH - 30)
         self.image(images[1], 15, self.WIDTH / 2 + 35, self.WIDTH - 30)
         self.image(images[2], 15, self.WIDTH, self.WIDTH - 30)
-
-    def analisys_page(self, elem, prices):
-        print("mario")
-        # TODO define analisys page body
 
     def page_body(self, images, elem):
         if len(images) < 3:
@@ -165,19 +142,12 @@ class PDF(fpdf.FPDF):
 
     def generate_graph(self, elem, is_first_page):
         # TODO: add expension code eg 'ONE'
-        home_dir = os.getenv("HOME")
 
         filter_price_csw = drender.render_prices_month(
             global_var.custom_dir
             + str(elem).lower().replace(" ", "/", elem.count(""))
             + "_price.csv",
             ["date", "min_price", "max_price", "mean_price"],
-        )
-
-        price_csw = rwCsw.read_csv(
-            global_var.custom_dir
-            + str(elem).lower().replace(" ", "/", elem.count(""))
-            + "_price.csv"
         )
 
         if self.render == True:

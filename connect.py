@@ -10,13 +10,14 @@ import yaml
 import src.priceCard as priceCard
 import src.rwCsw as rwCsw
 import src.connection as nwrk
-import src.pdfManipulation as pdf
+
+# import src.pdfManipulation as pdf
 import src.exceptions as expt
 import global_var
 
 base_url = "https://api.cardtrader.com/api/v2"
 game = "Magic"
-category = "Single Cards"
+# category = "Single Cards"
 
 database_url = "https://api.scryfall.com"
 

@@ -13,7 +13,6 @@ def render_prices_month(path, list_elem):
 
     csv_file = pandas.read_csv(path)
 
-    valid_date_no = 0
     valid_date = pandas.DataFrame()
 
     data = {}
@@ -24,7 +23,6 @@ def render_prices_month(path, list_elem):
         csv_date = datetime.datetime.strptime(csv_file["date"][elem], "%Y-%m-%d").date()
         if time_range < csv_date:
 
-            valid_date_no += 1
             tmp_dict = csv_file.iloc[[elem]].to_dict()
             if len(tmp_dict["date"].keys()) == 1 and first_elem == 0:
                 first_elem = list(tmp_dict["date"].keys())[0]
@@ -56,13 +54,11 @@ def render_stock_month(path):
 
     csv_file = pandas.read_csv(path)
 
-    valid_date_no = 0
     valid_date = pandas.DataFrame()
     # valid_date.columns = ['date', 'stock', 'foil', 'signed', 'altered']
     for elem in range(len(csv_file["date"])):
         csv_date = datetime.datetime.strptime(csv_file["date"][elem], "%Y-%m-%d").date()
         if time_range < csv_date:
-            valid_date_no += 1
             tmp_dict = csv_file.iloc[[elem]].to_dict()
             date = tmp_dict.get("date").get(elem)
             stock = tmp_dict.get("stock").get(elem)
