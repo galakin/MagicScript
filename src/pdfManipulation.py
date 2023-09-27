@@ -38,9 +38,12 @@ class PDF(fpdf.FPDF):
 
     def generate_file(self, csv_file, render):
         # Generates the report
+
+        self.set_font("Arial")
         self.render = render
         self.add_page()
         # Centered text in a framed 20*10 mm cell and line break
+
         self.cell(60, 10, "Report of cards prices", 0, 1)
         self.cell(60, 10, "Price updatae at: " + str(date.today()), 0, 1)
 
