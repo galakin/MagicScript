@@ -9,7 +9,8 @@ import matplotlib.pyplot as plt
 import src.rwCsw as rwCsw
 import src.stocks as stocks
 import src.dateRender as drender
-import src.cardInfo as cardInfo
+import src.pdf.cardInfo as cardInfo
+import src.pdf.card_type_graph as cg
 import global_var
 
 
@@ -46,7 +47,11 @@ class PDF(fpdf.FPDF):
             os.mkdir(global_var.custom_dir + "/images")
         is_first_page = True
         for elem in csv_file:
+
             self.generate_graph(elem, is_first_page)
+            for type in global_var.general_graph_type:
+                cg.card_graph(elem, self, type)
+
             self.generate_stocks_page(elem)
             cardInfo.generate_info(elem, self)
             self.add_page()

@@ -154,7 +154,6 @@ def write_card_price_csv(name, prices):
             ]
         )
         price_csv.close()
-    print(name.lower().replace(" ", "/", name.count("")) + "_price.csv")
     if (
         search_row(
             date.today(),
@@ -213,18 +212,13 @@ def read_csv(path):
 
 
 def search_row(name, field_name, file_name, log=False):
-    if log == True:
-        print("name field: " + str(name))
     home_dir = os.getenv("HOME")
     if home_dir == None:
         raise expt.InternalException('Unable to find "HOME" environment variable')
         # TODO add print path values
     else:
-        print(str(home_dir) + "/.priceCsv/" + file_name)
         csv_file = pandas.read_csv(str(home_dir) + "/.priceCsv/" + file_name)
 
-        if log == True:
-            print(csv_file)
     index = 0
     if log == True:
         print("range lenght: " + str(len(csv_file[field_name])))
