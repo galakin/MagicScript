@@ -11,11 +11,16 @@ def render_prices_month(path, list_elem):
     delta = datetime.timedelta(days=30)
     time_range = tod - delta
 
+    if path == None or path == "":
+        return None
     csv_file = pandas.read_csv(path)
 
     valid_date = pandas.DataFrame()
 
     data = {}
+
+    if list_elem == None or len(list_elem) == 0:
+        return None
     for elem in list_elem:
         data[elem] = []
     first_elem, elem_delta = 0, 0

@@ -26,5 +26,4 @@ jobs:
       - name: Run Python test
         run: |
           pip install -r requirement.txt
-          cd test
-          python test.py
+          pytest test/test.py
