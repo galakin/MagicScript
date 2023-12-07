@@ -15,10 +15,12 @@ def verify_connection(base_url, headers):
     response = requests.get(base_url + "/info", headers=headers)
     if response.status_code == 200:
         print("...Connection Established!\n")
+        return True
     else:
         raise expt.InternalException(
             "Unable to connet to CardTrader API server\nCheck if your API token is still valid!"
         )
+        return False
 
 
 def search_for_card(name, database_url, base_url, headers):

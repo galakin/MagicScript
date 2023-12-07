@@ -39,6 +39,7 @@ def fetch_local_card_data():
         raise expt.InternalException(
             "Unable to find environment variable named HOME\nplease check if you have defined it"
         )
+        return False
 
     price_csw = pathlib.Path(global_var.custom_dir + "/price.csv")
     file_path = pathlib.Path(home_dir + "/card.csv")
@@ -48,6 +49,7 @@ def fetch_local_card_data():
         raise expt.InternalException(
             "Unable to fin the card file a the default location!"
         )
+        return False
     if price_csw.is_file():
         print("... card price csv file found!")
     else:
@@ -65,6 +67,7 @@ def preliminary_action():
         raise expt.InternalException(
             "Unable to find environment variable named HOME\nplease check if you have defined it"
         )
+        return False
 
     else:
         if global_var.custom_dir == "":
@@ -88,6 +91,7 @@ def preliminary_action():
                 found_game = True
         if found_game == False:
             raise expt.InternalException("Unable to find selected Game")
+        return False
     return True
 
 

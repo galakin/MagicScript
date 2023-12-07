@@ -1,16 +1,19 @@
-test_threshold = 90
+import sys
 
-import test_connection as connection
+# from .. import src.connection as nwrk
+import sys
+import os
 
-total_test = 0
-successful_test = 0
+import connection as nwrk
+import dateRender as date
 
-print("start testing ...")
-print("...test connection module")
-connection_tst = connection.test_connection()
-print(
-    "total test: ",
-    connection_tst["total"],
-    "successfull test: ",
-    connection_tst["successfull"],
-)
+
+def test_date_render():
+    assert date.render_prices_month(None, []) == None
+    assert date.render_prices_month("", []) == None
+
+    f = open("test_csv.csv", "w")
+    f.write("data,prices\n0,0")
+    f.close()
+    assert date.render_prices_month("test_csv.csv", []) == None
+    os.remove("test_csv.csv")
