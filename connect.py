@@ -78,7 +78,6 @@ def preliminary_action():
                     global_var.custom_dir = config["custom_dir"]
                     global_var.custom_output = config["custom_output"]
                     global_var.custom_name = config["custom_name"]
-                    print(global_var.custom_dir)
                 except yaml.YAMLError as e:
                     print(e)
     found_game = False
@@ -91,14 +90,17 @@ def preliminary_action():
                 found_game = True
         if found_game == False:
             raise expt.InternalException("Unable to find selected Game")
-        return False
+            return False
     return True
 
 
 def main(render=True):
     nwrk.verify_connection(base_url, headers)
     home_dir = os.getenv("HOME")
-    if preliminary_action():
+    result = preliminary_action()
+    print(result)
+    if result:
+        print("finished prelim action")
         try:
             print("Fetching card info...")
             # TODO change card csv file
@@ -114,5 +116,6 @@ def main(render=True):
             pdf.generate_pdf_report(csv_file["card"], render=render)
 
         except expt.InternalException as ex:
+            print("unexpected error")
             print(ex)
             exit()

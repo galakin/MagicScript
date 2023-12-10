@@ -94,15 +94,11 @@ def generate_info(name, pdf):
     pdf.cell(
         60, 0, "Delta of stock: \t\t" + str(result["delta_stock"]) + " units", 0, 1
     )
-    if result["delta_stock"] < 0:
-        result["percentage_stock"] = round(result["percentage_stock"], 2) - 100
-    elif result["delta_stock"] >= 0:
-        result["percentage_stock"] = 100 - round(result["percentage_stock"], 2)
     pdf.cell(
         60,
         10,
         "Percentage grow of stock: \t\t"
-        + str(round(result["percentage_stock"], 2))
+        + str(round(result["percentage_stock"] - 100, 2))
         + "%",
         0,
         1,
@@ -121,10 +117,7 @@ def generate_info(name, pdf):
     pdf.cell(
         60, 0, "Delta of foil cards: \t\t" + str(result["delta_foil"]) + " units", 0, 1
     )
-    if result["delta_foil"] < 0:
-        result["percentage_foil"] = round(result["percentage_foil"], 2) - 100
-    elif result["delta_foil"] >= 0:
-        result["percentage_foil"] = 100 - round(result["percentage_foil"], 2)
+    result["percentage_foil"] = round(result["percentage_foil"], 2) - 100
     pdf.cell(
         60,
         10,
