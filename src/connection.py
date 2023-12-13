@@ -17,10 +17,10 @@ def verify_connection(base_url, headers):
         print("...Connection Established!\n")
         return True
     else:
+        print(response)
         raise expt.InternalException(
-            "Unable to connet to CardTrader API server\nCheck if your API token is still valid!"
+            "Unable to connect to CardTrader API server\nCheck if your API token is still valid!"
         )
-        return False
 
 
 def search_for_card(name, database_url, base_url, headers):
@@ -30,11 +30,11 @@ def search_for_card(name, database_url, base_url, headers):
 
     card_json = requests.get(database_url + "/cards/named?exact=" + name)
     if card_json.status_code != 200:
-        exit()
+        raise expt.InternalException("unable to fetch expensions card")
     card_expansion_code = card_json.json()["set"]
     expansion_code = requests.get(base_url + "/expansions", headers=headers)
     if expansion_code.status_code != 200:
-        exit()
+        return False
 
     print("...Retrived the list of expansions")
     for elem in expansion_code.json():
@@ -72,6 +72,7 @@ def search_for_card(name, database_url, base_url, headers):
         stocks.finds_stocks(selled_cards.json(), blueprint_id)
 
         rwCsw.write_to_csv(name, expansion_name, card_price)
+        return True
     else:
         raise expt.InvalidTagException(
             "Unable to find item with elem_id=", blueprint_id

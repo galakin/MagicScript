@@ -204,18 +204,31 @@ def write_card_price_csv(name, prices):
 
 def read_csv(path):
     home_dir = os.getenv("HOME")
-    if home_dir != None:
+    if home_dir != "":
+        if not os.path.isfile(path):
+            raise expt.InternalException('No csv file found under "' + str(path) + '"')
         csv_file = pandas.read_csv(path)
     else:
+        if not os.path.isfile(str(home_dir) + path):
+            raise expt.InternalException(
+                'No csv file found under "' + str(home_dir) + str(path) + '"'
+            )
         csv_file = pandas.read_csv(str(home_dir) + path)
     return csv_file
 
 
-def search_row(name, field_name, file_name, log=False):
+def search_row(field_value, field_name, file_name, log=False):
     home_dir = os.getenv("HOME")
-    if home_dir == None:
+    if home_dir == "":
         raise expt.InternalException('Unable to find "HOME" environment variable')
         # TODO add print path values
+
+    if not os.path.isfile(str(home_dir) + "/.priceCsv/" + file_name):
+        raise expt.InternalException(
+            "Unable to find csv file under "
+            + str(home_dir + "/.priceCsv/" + file_name)
+            + " path"
+        )
     else:
         csv_file = pandas.read_csv(str(home_dir) + "/.priceCsv/" + file_name)
 
@@ -223,8 +236,7 @@ def search_row(name, field_name, file_name, log=False):
     if log == True:
         print("range lenght: " + str(len(csv_file[field_name])))
     for elem in range(len(csv_file[field_name])):
-        if str(csv_file[field_name][elem]) == str(name):
-
+        if str(csv_file[field_name][elem]) == str(field_value):
             return index
         index += 1
     return -1
