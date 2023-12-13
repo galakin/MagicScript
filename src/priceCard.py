@@ -2,6 +2,14 @@ import src.exceptions as expt
 
 
 def get_prices(seller_list, item_tag):
+    if len(seller_list) == 0:
+        raise expt.InternalException(
+            "Unable to fetch seller list for item with tag: " + str(item_tag)
+        )
+    if item_tag == None or item_tag.replace(" ", "") == "":
+        raise expt.InternalException(
+            'Item tag: "' + str(item_tag) + "\" isn't specified correctly"
+        )
     # IDEA: item list are in increasing pricing order, the first elem is the
     # cheapest one, the latest elem is the more expensive one
     try:
@@ -11,6 +19,8 @@ def get_prices(seller_list, item_tag):
         signed_list = extract_map["signed_list"]
         altered_list = extract_map["altered_list"]
         mean_price = 0
+        if len(default_list) == 0:
+            raise expt.InternalException("Unable to fetch prices on empty card list")
         for elem in default_list:
             mean_price += elem["price_cents"] / 100
         mean_price = mean_price / len(default_list)
@@ -61,12 +71,20 @@ def get_prices(seller_list, item_tag):
     except expt.InternalException as ex:
         print(ex)
         print("env, item_tag: ", item_tag)
-        print("seller list: " + str(seller_list[item_tag][0]))
+        # print("seller list: " + str(seller_list[item_tag][0]))
         exit(-1)
 
 
 # Extract the price for the `default` item, where default means no foil, nor signed or altered
 def extract_default(seller_list, item_tag):
+    if len(seller_list) == 0:
+        raise expt.InternalException(
+            "Unable to fetch seller list for item with tag: " + str(item_tag)
+        )
+    if item_tag == None or item_tag.replace(" ", "") == "":
+        raise expt.InternalException(
+            'Item tag: "' + str(item_tag) + "\" isn't specified correctly"
+        )
     default_list, foil_list, signed_list, altered_list = [], [], [], []
     for elem in range(len(seller_list[item_tag])):
         if (
