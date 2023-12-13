@@ -14,6 +14,7 @@ import src.connection as nwrk
 import src.pdfManipulation as pdf
 import src.exceptions as expt
 import global_var
+import mysql_connect
 
 base_url = "https://api.cardtrader.com/api/v2"
 game = "Magic"
@@ -41,7 +42,7 @@ def fetch_local_card_data():
         )
         return False
 
-    price_csw = pathlib.Path(global_var.custom_dir + "/price.csv")
+    price_csv = pathlib.Path(global_var.custom_dir + "/price.csv")
     file_path = pathlib.Path(home_dir + "/card.csv")
     if file_path.is_file():
         print("Card file found!")
@@ -50,12 +51,16 @@ def fetch_local_card_data():
             "Unable to fin the card file a the default location!"
         )
         return False
-    if price_csw.is_file():
+    if price_csv.is_file():
         print("... card price csv file found!")
     else:
-        price_csw = open(global_var.custom_dir + "/price.csv", "x")
-        price_csw.writelines(["name,exp,min_price,max_price,mean_price\n"])
-        price_csw.close()
+        price_csv = open(global_var.custom_dir + "/price.csv", "x")
+        price_csv.writelines(
+            [
+                "name,exp,min_price,max_price,mean_price,foil_min_price,foil_max_price,foil_mean_price,signed_min_price,signed_max_price,signed_mean_price,altered_min_price,altered_max_price,altered_mean_price\n"
+            ]
+        )
+        price_csv.close()
         print("... card price csv file created!")
     return True
 
@@ -78,12 +83,24 @@ def preliminary_action():
                     global_var.custom_dir = config["custom_dir"]
                     global_var.custom_output = config["custom_output"]
                     global_var.custom_name = config["custom_name"]
+                    global_var.storage_method = config["storage_method"]
                 except yaml.YAMLError as e:
                     print(e)
     found_game = False
-    if fetch_local_card_data():
+    if global_var.storage_method == "csv":
+        if fetch_local_card_data():
+            response = requests.get(base_url + "/games", headers=headers)
+            for elem in response.json()["array"]:
+                if elem["name"] == game:
+                    print("Selected game found!")
+                    found_game = True
+            if found_game == False:
+                raise expt.InternalException("Unable to find selected Game")
+                return False
+    elif global_var.storage_method == "mysql":
+        print("Using mysql db as backend")
+        mysql_connect.fetch_local_card_data()
         response = requests.get(base_url + "/games", headers=headers)
-        # print(response.json()['array'])
         for elem in response.json()["array"]:
             if elem["name"] == game:
                 print("Selected game found!")
@@ -96,24 +113,38 @@ def preliminary_action():
 
 def main(render=True):
     nwrk.verify_connection(base_url, headers)
-    home_dir = os.getenv("HOME")
     result = preliminary_action()
-    print(result)
     if result:
         print("finished prelim action")
         try:
+            import mysql.connector
+
+            cards_list = mysql_connect.return_cards_list()
             print("Fetching card info...")
-            # TODO change card csv file
-            csv_file = rwCsw.read_csv(home_dir + "/card.csv")
-            for elem in range(len(csv_file["card"])):
+
+            # TODO: check csv compleatness
+            for elem in cards_list:
                 try:
-                    nwrk.search_for_card(
-                        csv_file["card"][elem], database_url, base_url, headers
-                    )
+                    if elem[1] != None:
+                        nwrk.search_for_card(
+                            elem[0],
+                            elem[1],
+                            database_url,
+                            base_url,
+                            headers,
+                        )
+                    else:
+                        nwrk.search_for_card(
+                            elem[0],
+                            None,
+                            database_url,
+                            base_url,
+                            headers,
+                        )
                 except expt.InvalidTagException as ex:
                     print(ex)
-
-            pdf.generate_pdf_report(csv_file["card"], render=render)
+            if render:
+                pdf.generate_pdf_report(cards_list)
 
         except expt.InternalException as ex:
             print("unexpected error")

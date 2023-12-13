@@ -5,9 +5,10 @@ import pandas  # TODO: change import location
 import json
 
 import src.priceCard as priceCard
-import src.rwCsw as rwCsw
+import src.rwmysql as rwmysql
 import src.exceptions as expt
 import src.stocks as stocks
+import mysql_connect
 
 
 def verify_connection(base_url, headers):
@@ -17,26 +18,39 @@ def verify_connection(base_url, headers):
         print("...Connection Established!\n")
         return True
     else:
+        print(response)
         raise expt.InternalException(
-            "Unable to connet to CardTrader API server\nCheck if your API token is still valid!"
+            "Unable to connect to CardTrader API server\nCheck if your API token is still valid!"
         )
-        return False
 
 
-def search_for_card(name, database_url, base_url, headers):
+def search_for_card(name, expansion, database_url, base_url, headers):
     blueprint_id = -1
     expansion_id = -1
     expansion_name = ""
 
-    card_json = requests.get(database_url + "/cards/named?exact=" + name)
+    if expansion == None:
+        card_json = requests.get(database_url + "/cards/named?exact=" + name)
+    else:
+        card_json = requests.get(
+            database_url + "/cards/named?exact=" + name + "&set=" + expansion
+        )
     if card_json.status_code != 200:
-        exit()
+        print("...Unable to find exact card named: " + name)
+
+        # TODO: search card with fuzzy finder
+        card_json = requests.get(database_url + "/cards/named?fuzzy=" + name)
+        if card_json.status_code != 200:
+            raise expt.InternalException("unable to fetch card with name: " + name)
+
+    # QUESTION: is the following code necessary?
     card_expansion_code = card_json.json()["set"]
+    name = card_json.json()["name"]
     expansion_code = requests.get(base_url + "/expansions", headers=headers)
     if expansion_code.status_code != 200:
-        exit()
+        return False
 
-    print("...Retrived the list of expansions")
+    print("...Retrived the list of expansions for " + name)
     for elem in expansion_code.json():
         if elem["code"] == card_expansion_code:
             if expansion_id > 0:
@@ -54,6 +68,7 @@ def search_for_card(name, database_url, base_url, headers):
         raise expt.InternalException("unable to fetch expensions card")
 
     for elem in card_blueprint.json():
+        # print(elem["name"])
         if elem["name"] == name:
             if blueprint_id > 0:
                 raise expt.InternalException("two product with the same name found")
@@ -65,14 +80,15 @@ def search_for_card(name, database_url, base_url, headers):
     )
 
     tst = list(selled_cards.json().keys())
-
     print("...fetching prices info")
-    if tst[0] != "error":
+    if tst[0] != "-1":
         card_price = priceCard.get_prices(selled_cards.json(), tst[0])
-        stocks.finds_stocks(selled_cards.json(), blueprint_id)
-
-        rwCsw.write_to_csv(name, expansion_name, card_price)
+        stocks.finds_stocks(selled_cards.json(), blueprint_id, expansion_name)
+        rwmysql.write_to_csv(name, expansion_name, card_price)
+        return True
     else:
+        # print(len(card_blueprint.json()))
         raise expt.InvalidTagException(
             "Unable to find item with elem_id=", blueprint_id
         )
+        return False

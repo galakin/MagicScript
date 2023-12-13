@@ -105,13 +105,22 @@ def config_script():
         else:
             print('Please enter "Y" or "n"')
 
-    config_map["custom_name"] = "PriceRepot.pdf"
+    config_map["custom_name"] = "PriceReport.pdf"
     if prompt_input.lower() == "n":
         print(
             "NOTE: If you enter a file's name that already exits it will be overwrite!"
         )
         config_map["custom_name"] = input("Enter output's pdf file's name: ")
     f.write('custom_name: "' + config_map["custom_name"] + '"\n')
+
+    check_semantic = False
+    while check_semantic == False:
+        storage_method = input("Storage method [csv/mongo]: ")
+        if storage_method.lower() == "csv" or storage_method.lower() == "mongo":
+            check_semantic = True
+        else:
+            print('Please enter "csv" or "mongo"')
+    f.write('storage_method: "' + storage_method + '"\n')
 
     # set fetch info rate
     f.write('fetch_rate: "daily"\n')
