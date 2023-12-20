@@ -11,6 +11,7 @@ import src.rwCsw as rwCsw
 import src.stocks as stocks
 import src.dateRender as drender
 import global_var
+import src.pdf.fetch_card_image as fci
 
 
 def generate_info(name, pdf):
@@ -64,6 +65,9 @@ def generate_info(name, pdf):
         "delta_signed": end_signed - start_signed,
         "percentage_signed": end_signed * 100 / start_signed,
     }
+
+    # retrive card image
+    fci.fetch_card_image(name)
 
     pdf.add_page()
     pdf.cell(60, 10, "Info for " + str(name), 0, 1)
@@ -256,3 +260,13 @@ def generate_info(name, pdf):
         0,
         1,
     )
+
+    pdf.image(
+        global_var.custom_dir + "images/card_tmp/" + name + "_image.jpg",
+        x=130,
+        y=40,
+        w=0,
+        h=90,
+    )
+
+    fci.cleanup()

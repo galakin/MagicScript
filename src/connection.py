@@ -23,14 +23,31 @@ def verify_connection(base_url, headers):
         )
 
 
-def search_for_card(name, database_url, base_url, headers):
+def search_for_card(name, expansion, database_url, base_url, headers):
     blueprint_id = -1
     expansion_id = -1
     expansion_name = ""
 
-    card_json = requests.get(database_url + "/cards/named?exact=" + name)
+    if expansion == None:
+        card_json = requests.get(database_url + "/cards/named?exact=" + name)
+    else:
+        card_json = requests.get(
+            database_url + "/cards/named?exact=" + name + "&set=" + expansion
+        )
     if card_json.status_code != 200:
-        raise expt.InternalException("unable to fetch expensions card")
+        print("...Unable to find exact card named: " + name)
+
+        # TODO: search card with fuzzy finder
+        if expansion == None:
+            card_json = requests.get(database_url + "/cards/named?fuzzy=" + name)
+        else:
+            card_json = requests.get(
+                database_url + "/cards/named?fuzzy=" + name + "&sed=" + expansion
+            )
+        if card_json.status_code != 200:
+            raise expt.InternalException("unable to fetch card with name: " + name)
+
+    # QUESTION: is the following code necessary?
     card_expansion_code = card_json.json()["set"]
     expansion_code = requests.get(base_url + "/expansions", headers=headers)
     if expansion_code.status_code != 200:
