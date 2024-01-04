@@ -6,6 +6,7 @@ import json
 import argparse
 import sys
 import yaml
+import pymongo
 
 import src.priceCard as priceCard
 import src.rwCsw as rwCsw
