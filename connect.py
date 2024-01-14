@@ -43,7 +43,7 @@ def fetch_local_card_data():
         )
         return False
 
-    price_csw = pathlib.Path(global_var.custom_dir + "/price.csv")
+    price_csv = pathlib.Path(global_var.custom_dir + "/price.csv")
     file_path = pathlib.Path(home_dir + "/card.csv")
     if file_path.is_file():
         print("Card file found!")
@@ -52,16 +52,16 @@ def fetch_local_card_data():
             "Unable to fin the card file a the default location!"
         )
         return False
-    if price_csw.is_file():
+    if price_csv.is_file():
         print("... card price csv file found!")
     else:
-        price_csw = open(global_var.custom_dir + "/price.csv", "x")
-        price_csw.writelines(
+        price_csv = open(global_var.custom_dir + "/price.csv", "x")
+        price_csv.writelines(
             [
                 "name,exp,min_price,max_price,mean_price,foil_min_price,foil_max_price,foil_mean_price,signed_min_price,signed_max_price,signed_mean_price,altered_min_price,altered_max_price,altered_mean_price\n"
             ]
         )
-        price_csw.close()
+        price_csv.close()
         print("... card price csv file created!")
     return True
 
@@ -84,18 +84,23 @@ def preliminary_action():
                     global_var.custom_dir = config["custom_dir"]
                     global_var.custom_output = config["custom_output"]
                     global_var.custom_name = config["custom_name"]
+                    global_var.storage_method = config["storage_method"]
                 except yaml.YAMLError as e:
                     print(e)
     found_game = False
-    if fetch_local_card_data():
-        response = requests.get(base_url + "/games", headers=headers)
-        for elem in response.json()["array"]:
-            if elem["name"] == game:
-                print("Selected game found!")
-                found_game = True
-        if found_game == False:
-            raise expt.InternalException("Unable to find selected Game")
-            return False
+    if global_var.storage_method == "csv":
+        if fetch_local_card_data():
+            response = requests.get(base_url + "/games", headers=headers)
+            for elem in response.json()["array"]:
+                if elem["name"] == game:
+                    print("Selected game found!")
+                    found_game = True
+            if found_game == False:
+                raise expt.InternalException("Unable to find selected Game")
+                return False
+    else:
+        pass
+        # TODO: write body for mongo storage method
     return True
 
 
