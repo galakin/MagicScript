@@ -54,6 +54,7 @@ def fetch_local_card_data():
     if price_csw.is_file():
         print("... card price csv file found!")
     else:
+        print(global_var.custom_dir + "/price.csv")
         price_csw = open(global_var.custom_dir + "/price.csv", "x")
         price_csw.writelines(
             [
@@ -102,7 +103,6 @@ def main(render=True):
     nwrk.verify_connection(base_url, headers)
     home_dir = os.getenv("HOME")
     result = preliminary_action()
-    print(result)
     if result:
         print("finished prelim action")
         try:
