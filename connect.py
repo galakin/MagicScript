@@ -16,6 +16,7 @@ import src.pdfManipulation as pdf
 import src.exceptions as expt
 import global_var
 import src.check_csv as check_csv
+import mongo_connect
 
 base_url = "https://api.cardtrader.com/api/v2"
 game = "Magic"
@@ -88,6 +89,7 @@ def preliminary_action():
                 except yaml.YAMLError as e:
                     print(e)
     found_game = False
+    print(global_var.storage_method)
     if global_var.storage_method == "csv":
         if fetch_local_card_data():
             response = requests.get(base_url + "/games", headers=headers)
@@ -98,7 +100,9 @@ def preliminary_action():
             if found_game == False:
                 raise expt.InternalException("Unable to find selected Game")
                 return False
-    else:
+    elif global_var.storage_method == "mongodb":
+        print("Using mongo db as backend")
+        mongo_connect.fetch_local_card_data()
         pass
         # TODO: write body for mongo storage method
     return True
