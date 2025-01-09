@@ -10,8 +10,11 @@ import global_var as gvar
 # database_url = "https://api.scryfall.com"
 
 
+
 def fetch_card_image(card_info, card_set=None):
     card_name = card_info[0]
+
+
     if card_name == None or card_name == "":
         raise expt.InternalException("Unable to determine card name")
 

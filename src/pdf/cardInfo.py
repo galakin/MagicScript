@@ -78,7 +78,6 @@ def generate_info(pdf, card_info):
 
     # retrive card image
     fci.fetch_card_image(card_info)
-
     pdf.add_page()
     pdf.cell(60, 10, "Info for " + str(card_info[0]), 0, 1)
     pdf.cell(
@@ -272,7 +271,9 @@ def generate_info(pdf, card_info):
     )
 
     pdf.image(
+
         global_var.custom_dir + "images/card_tmp/" + card_info[0] + "_image.jpg",
+      
         x=130,
         y=40,
         w=0,

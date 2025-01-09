@@ -113,7 +113,7 @@ def preliminary_action():
 
 def main(render=True):
     nwrk.verify_connection(base_url, headers)
-    result = preliminary_action()
+i    result = preliminary_action()
     if result:
         print("finished prelim action")
         try:

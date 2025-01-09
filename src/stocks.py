@@ -6,11 +6,13 @@ from datetime import date
 from matplotlib import rcParams
 import matplotlib.pyplot as plt
 
+
 import src.rwmysql as rwmysql
 import src.exceptions as expt
 
 
 def finds_stocks(selled_cards, blueprint_id, expansion_name):
+
     if len(selled_cards) == 0:
         raise expt.InternalException(
             "Unable to fetch seller list for item with tag: " + str(selled_cards)

@@ -77,6 +77,7 @@ class PDF(fpdf.FPDF):
             )
             exit(-1)
         if len(images) == 3:
+
             self.image(images[0], 15, 50, self.WIDTH - 30)
             self.image(images[1], 15, self.WIDTH / 2 + 25, self.WIDTH - 30)
             self.image(images[2], 15, self.WIDTH, self.WIDTH - 30)

@@ -248,3 +248,22 @@ def search_row(field_value, field_name, file_name, log=False, file_path=None):
             return index
         index += 1
     return -1
+
+
+def write_expansion_code(card_name, expansion_code):
+    # TODO: change the card.csv fetch procedure
+    home_dir = os.getenv("HOME")
+    if home_dir == "":
+        raise expt.InternalException('Unable to find "HOME" environment variable')
+
+    row_no = search_row(card_name, "card", "/card.csv", file_path=os.getenv("HOME")) + 1
+    price_csv = open(home_dir + "/card.csv", "r").readlines()
+
+    # price_csv_row = price_csv[row_no][0:len(price_csv[row_no])-1] + "," + expansion_code)
+    price_csv[row_no] = (
+        price_csv[row_no][0 : len(price_csv[row_no]) - 1] + "," + expansion_code + "\n"
+    )
+
+    out = open(home_dir + "/card.csv", "w")
+    out.writelines(price_csv)
+    out.close()
