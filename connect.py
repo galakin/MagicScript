@@ -42,7 +42,7 @@ def fetch_local_card_data():
         )
         return False
 
-    price_csw = pathlib.Path(global_var.custom_dir + "/price.csv")
+    price_csv = pathlib.Path(global_var.custom_dir + "/price.csv")
     file_path = pathlib.Path(home_dir + "/card.csv")
     if file_path.is_file():
         print("Card file found!")
@@ -51,7 +51,7 @@ def fetch_local_card_data():
             "Unable to fin the card file a the default location!"
         )
         return False
-    if price_csw.is_file():
+    if price_csv.is_file():
         print("... card price csv file found!")
     else:
         price_csv = open(global_var.custom_dir + "/price.csv", "x")
@@ -83,10 +83,23 @@ def preliminary_action():
                     global_var.custom_dir = config["custom_dir"]
                     global_var.custom_output = config["custom_output"]
                     global_var.custom_name = config["custom_name"]
+                    global_var.storage_method = config["storage_method"]
                 except yaml.YAMLError as e:
                     print(e)
     found_game = False
-    if fetch_local_card_data():
+    if global_var.storage_method == "csv":
+        if fetch_local_card_data():
+            response = requests.get(base_url + "/games", headers=headers)
+            for elem in response.json()["array"]:
+                if elem["name"] == game:
+                    print("Selected game found!")
+                    found_game = True
+            if found_game == False:
+                raise expt.InternalException("Unable to find selected Game")
+                return False
+    elif global_var.storage_method == "mysql":
+        print("Using mysql db as backend")
+        mysql_connect.fetch_local_card_data()
         response = requests.get(base_url + "/games", headers=headers)
         for elem in response.json()["array"]:
             if elem["name"] == game:
@@ -100,9 +113,7 @@ def preliminary_action():
 
 def main(render=True):
     nwrk.verify_connection(base_url, headers)
-    home_dir = os.getenv("HOME")
-    result = preliminary_action()
-    print(result)
+i    result = preliminary_action()
     if result:
         print("finished prelim action")
         try:
@@ -110,6 +121,7 @@ def main(render=True):
 
             cards_list = mysql_connect.return_cards_list()
             print("Fetching card info...")
+
             # TODO: check csv compleatness
             for elem in cards_list:
                 try:
@@ -131,8 +143,8 @@ def main(render=True):
                         )
                 except expt.InvalidTagException as ex:
                     print(ex)
-
-            pdf.generate_pdf_report(csv_file["card"], render=render)
+            if render:
+                pdf.generate_pdf_report(cards_list)
 
         except expt.InternalException as ex:
             print("unexpected error")

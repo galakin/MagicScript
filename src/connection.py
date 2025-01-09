@@ -5,9 +5,10 @@ import pandas  # TODO: change import location
 import json
 
 import src.priceCard as priceCard
-import src.rwCsw as rwCsw
+import src.rwmysql as rwmysql
 import src.exceptions as expt
 import src.stocks as stocks
+import mysql_connect
 
 
 def verify_connection(base_url, headers):
@@ -44,11 +45,12 @@ def search_for_card(name, expansion, database_url, base_url, headers):
 
     # QUESTION: is the following code necessary?
     card_expansion_code = card_json.json()["set"]
+    name = card_json.json()["name"]
     expansion_code = requests.get(base_url + "/expansions", headers=headers)
     if expansion_code.status_code != 200:
         return False
 
-    print("...Retrived the list of expansions")
+    print("...Retrived the list of expansions for " + name)
     for elem in expansion_code.json():
         if elem["code"] == card_expansion_code:
             if expansion_id > 0:
@@ -66,6 +68,7 @@ def search_for_card(name, expansion, database_url, base_url, headers):
         raise expt.InternalException("unable to fetch expensions card")
 
     for elem in card_blueprint.json():
+        # print(elem["name"])
         if elem["name"] == name:
             if blueprint_id > 0:
                 raise expt.InternalException("two product with the same name found")
@@ -81,10 +84,11 @@ def search_for_card(name, expansion, database_url, base_url, headers):
     if tst[0] != "-1":
         card_price = priceCard.get_prices(selled_cards.json(), tst[0])
         stocks.finds_stocks(selled_cards.json(), blueprint_id, expansion_name)
-
         rwmysql.write_to_csv(name, expansion_name, card_price)
         return True
     else:
+        # print(len(card_blueprint.json()))
         raise expt.InvalidTagException(
             "Unable to find item with elem_id=", blueprint_id
         )
+        return False

@@ -13,64 +13,73 @@ import src.dateRender as drender
 import global_var
 import src.pdf.fetch_card_image as fci
 
+"""Generate the pdf page with the card information schema
+    pdf: the pdf object used to construct the cards report
+    card_info: the specific card infromation, used to fetch data form DB
+"""
 
-def generate_info(name, pdf):
-    print("...Rendering " + str(name) + " info page")
+
+def generate_info(pdf, card_info):
 
     # retrive info for card stock
-    filter_stock_csw = drender.render_stock_month(
-        global_var.custom_dir
-        + str(name).lower().replace(" ", "/", name.count(""))
-        + "_stock.csv"
-    )
-    start_stock = filter_stock_csw.iloc[[0]]["stock"].values[0]
 
-    end_stock = filter_stock_csw.iloc[[len(filter_stock_csw) - 1]]["stock"].values[0]
-    # print("start stock: "+str(start_stock)+" end stock: "+str(end_stock))
+    filter_stock_csw = drender.render_stock_month(
+        card_info, ["stocks", "foil", "signed", "altered", "stock_date"]
+    )
+    start_stock = filter_stock_csw["stocks"][0]
+    end_stock = filter_stock_csw["stocks"][len(filter_stock_csw) - 1]
 
     #          date  stock  foil  signed  altered
     start_foil, end_foil = (
-        filter_stock_csw.iloc[[0]]["foil"].values[0],
-        filter_stock_csw.iloc[[len(filter_stock_csw) - 1]]["foil"].values[0],
+        filter_stock_csw["foil"][0],
+        filter_stock_csw["foil"][len(filter_stock_csw) - 1],
     )
     start_signed, end_signed = (
-        filter_stock_csw.iloc[[0]]["signed"].values[0],
-        filter_stock_csw.iloc[[len(filter_stock_csw) - 1]]["signed"].values[0],
+        filter_stock_csw["signed"][0],
+        filter_stock_csw["signed"][len(filter_stock_csw) - 1],
     )
 
     # retrive info for card prices
     filter_price_csw = drender.render_prices_month(
-        global_var.custom_dir
-        + str(name).lower().replace(" ", "/", name.count(""))
-        + "_price.csv",
-        ["date", "min_price", "max_price", "mean_price"],
+        card_info, ["price_date", "min_price", "max_price", "mean_price"]
     )
 
     start_min, start_max, start_mean = (
-        filter_price_csw.iloc[[0]]["min_price"].values[0],
-        filter_price_csw.iloc[[0]]["max_price"].values[0],
-        filter_price_csw.iloc[[0]]["mean_price"].values[0],
+        filter_price_csw["min_price"][0],
+        filter_price_csw["max_price"][0],
+        filter_price_csw["mean_price"][0],
     )
     end_min, end_max, end_mean = (
-        filter_price_csw.iloc[[len(filter_price_csw) - 1]]["min_price"].values[0],
-        filter_price_csw.iloc[[len(filter_price_csw) - 1]]["max_price"].values[0],
-        filter_price_csw.iloc[[len(filter_price_csw) - 1]]["mean_price"].values[0],
+        filter_price_csw["min_price"][len(filter_price_csw) - 1],
+        filter_price_csw["max_price"][len(filter_price_csw) - 1],
+        filter_price_csw["mean_price"][len(filter_price_csw) - 1],
     )
 
+    if end_stock == 0:
+        percentage_stock = 0
+    else:
+        percentage_stock = end_stock * 100 / start_stock
+    if end_foil == 0:
+        percentage_foil = 0
+    else:
+        percentage_foil = end_foil * 100 / start_foil
+    if end_signed == 0:
+        percentage_signed = 0
+    else:
+        percentage_signed = end_signed * 100 / start_signed
     result = {
         "delta_stock": end_stock - start_stock,
-        "percentage_stock": end_stock * 100 / start_stock,
+        "percentage_stock": percentage_stock,
         "delta_foil": end_foil - start_foil,
-        "percentage_foil": end_foil * 100 / start_foil,
+        "percentage_foil": percentage_foil,
         "delta_signed": end_signed - start_signed,
-        "percentage_signed": end_signed * 100 / start_signed,
+        "percentage_signed": percentage_signed,
     }
 
     # retrive card image
-    fci.fetch_card_image(name)
-
+    fci.fetch_card_image(card_info)
     pdf.add_page()
-    pdf.cell(60, 10, "Info for " + str(name), 0, 1)
+    pdf.cell(60, 10, "Info for " + str(card_info[0]), 0, 1)
     pdf.cell(
         60,
         10,
@@ -262,7 +271,9 @@ def generate_info(name, pdf):
     )
 
     pdf.image(
-        global_var.custom_dir + "images/card_tmp/" + name + "_image.jpg",
+
+        global_var.custom_dir + "images/card_tmp/" + card_info[0] + "_image.jpg",
+      
         x=130,
         y=40,
         w=0,

@@ -1,100 +1,111 @@
 import pandas
 import datetime
+import calendar
 
 import src.exceptions as expt
 import src.rwCsw as rwCsw
 
+""" return the price in the latest month time frame
+    card_info: complete list of card information with card name and expansion
+    list_elem: list of card type that need to be rendered/filtered
+"""
 
-def render_prices_month(path, list_elem):
+
+def render_prices_month(card_info, list_elem):
+    import mysql.connector
+
     print("...render latest month prices")
+
+    database = mysql.connector.connect(
+        host="localhost", user="root", password="cul5ai2xnsgs"
+    )
+
+    mycursor = database.cursor()
+    mycursor.execute("USE cards_database;")
+
+    select_fields = ""
+    for elem in range(len(list_elem)):
+        if elem < len(list_elem) - 1:
+            select_fields = select_fields + str(list_elem[elem]) + ", "
+        else:
+            select_fields = select_fields + str(list_elem[elem])
+
     tod = datetime.datetime.now().date()
     delta = datetime.timedelta(days=30)
     time_range = tod - delta
 
-    if path == None or path == "":
-        return None
-    csv_file = pandas.read_csv(path)
+    lower_epoch = calendar.timegm(
+        datetime.datetime(
+            time_range.year, time_range.month, time_range.day, 0, 0, 0
+        ).timetuple()
+    )
+    mycursor.execute(
+        "SELECT "
+        + select_fields
+        + " FROM `"
+        + card_info[0].lower().replace(" ", "_", card_info[0].count(""))
+        + "_"
+        + str(card_info[1])
+        + "_price` WHERE price_date > "
+        + str(lower_epoch)
+    )
 
-    valid_date = pandas.DataFrame()
+    rendered_date_price = {}
 
-    data = {}
-
-    if list_elem == None or len(list_elem) == 0:
-        return None
+    # generate the empty elem in for every item in list_elem on the map rendered_date_price
     for elem in list_elem:
-        data[elem] = []
-    first_elem, elem_delta = 0, 0
+        rendered_date_price[elem] = []
 
-    for elem in range(len(csv_file["date"])):
-        # print(csv_file["date"])
-        # print(csv_file["date"][elem])
-        if csv_file["date"][elem] != 0:
-            csv_date = datetime.datetime.strptime(
-                str(csv_file["date"][elem]), "%Y-%m-%d"
-            ).date()
-            if time_range < csv_date:
+    # populate the rendered_date_price
+    for elem in mycursor:
+        for field_index in range(len(list_elem)):
+            rendered_date_price[list_elem[field_index]].append(elem[field_index])
 
-                tmp_dict = csv_file.iloc[[elem]].to_dict()
-                if len(tmp_dict["date"].keys()) == 1 and first_elem == 0:
-                    first_elem = list(tmp_dict["date"].keys())[0]
-
-                if valid_date.empty:
-                    for index in range(len(list_elem)):
-                        data[list_elem[index]] = [
-                            tmp_dict.get(list_elem[index]).get(first_elem)
-                        ]
-                    valid_date = pandas.DataFrame.from_dict(data)
-                else:
-                    for index in range(len(list_elem)):
-                        data[list_elem[index]] = tmp_dict.get(list_elem[index]).get(
-                            first_elem
-                        )
-                    valid_date.loc[len(valid_date.index)] = data
-                first_elem += 1
-
-    # print("valid date: " + str(len(valid_date.index)))
-
-    return valid_date
+    # print(rendered_date_price)
+    return rendered_date_price
 
 
-def render_stock_month(path):
-    print("...render latest month stock")
+""" render the stock month info """
+# TODO: implemet the field list
+def render_stock_month(card_info, list_elem):
+    import mysql.connector
+
+    print("...render latest month prices")
+
+    database = mysql.connector.connect(
+        host="localhost", user="root", password="cul5ai2xnsgs"
+    )
+
+    mycursor = database.cursor()
+    mycursor.execute("USE cards_database;")
+
+    print("...render latest month stock for " + str(card_info[0]))
+
     tod = datetime.datetime.now().date()
     delta = datetime.timedelta(days=30)
     time_range = tod - delta
 
-    csv_file = pandas.read_csv(path)
+    lower_epoch = calendar.timegm(
+        datetime.datetime(
+            time_range.year, time_range.month, time_range.day, 0, 0, 0
+        ).timetuple()
+    )
 
-    valid_date = pandas.DataFrame()
-    # valid_date.columns = ['date', 'stock', 'foil', 'signed', 'altered']
-    for elem in range(len(csv_file["date"])):
-        csv_date = datetime.datetime.strptime(csv_file["date"][elem], "%Y-%m-%d").date()
-        if time_range < csv_date:
-            tmp_dict = csv_file.iloc[[elem]].to_dict()
-            date = tmp_dict.get("date").get(elem)
-            stock = tmp_dict.get("stock").get(elem)
-            foil = tmp_dict.get("foil").get(elem)
-            signed = tmp_dict.get("signed").get(elem)
-            altered = tmp_dict.get("altered").get(elem)
-            data = {
-                "date": [date],
-                "stock": [stock],
-                "foil": [foil],
-                "signed": [signed],
-                "altered": [altered],
-            }
+    mycursor.execute(
+        "SELECT * FROM `"
+        + card_info[0].lower().replace(" ", "_", card_info[0].count(""))
+        + "_"
+        + str(card_info[1])
+        + "_stock` WHERE stock_date > "
+        + str(lower_epoch)
+    )
 
-            if valid_date.empty:
-                valid_date = pandas.DataFrame.from_dict(data)
-            else:
-                valid_date.loc[len(valid_date.index)] = {
-                    "date": date,
-                    "stock": stock,
-                    "foil": foil,
-                    "signed": signed,
-                    "altered": altered,
-                }
+    rendered_stock_price = {}
+    for elem in list_elem:
+        rendered_stock_price[elem] = []
 
-    # print("valid date: " + str(len(valid_date.index)))
+    for elem in mycursor:
+        for field_index in range(len(list_elem)):
+            rendered_stock_price[list_elem[field_index]].append(elem[field_index])
 
-    return valid_date
+    return rendered_stock_price
