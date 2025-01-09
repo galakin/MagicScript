@@ -38,12 +38,7 @@ def search_for_card(name, expansion, database_url, base_url, headers):
         print("...Unable to find exact card named: " + name)
 
         # TODO: search card with fuzzy finder
-        if expansion == None:
-            card_json = requests.get(database_url + "/cards/named?fuzzy=" + name)
-        else:
-            card_json = requests.get(
-                database_url + "/cards/named?fuzzy=" + name + "&sed=" + expansion
-            )
+        card_json = requests.get(database_url + "/cards/named?fuzzy=" + name)
         if card_json.status_code != 200:
             raise expt.InternalException("unable to fetch card with name: " + name)
 
@@ -82,13 +77,12 @@ def search_for_card(name, expansion, database_url, base_url, headers):
     )
 
     tst = list(selled_cards.json().keys())
-
     print("...fetching prices info")
-    if tst[0] != "error":
+    if tst[0] != "-1":
         card_price = priceCard.get_prices(selled_cards.json(), tst[0])
-        stocks.finds_stocks(selled_cards.json(), blueprint_id)
+        stocks.finds_stocks(selled_cards.json(), blueprint_id, expansion_name)
 
-        rwCsw.write_to_csv(name, expansion_name, card_price)
+        rwmysql.write_to_csv(name, expansion_name, card_price)
         return True
     else:
         raise expt.InvalidTagException(

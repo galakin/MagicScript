@@ -111,7 +111,7 @@ def main(render=True):
             cards_list = mysql_connect.return_cards_list()
             print("Fetching card info...")
             # TODO: check csv compleatness
-            for elem in card_list:
+            for elem in cards_list:
                 try:
                     if elem[1] != None:
                         nwrk.search_for_card(
