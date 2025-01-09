@@ -14,7 +14,7 @@ import src.connection as nwrk
 import src.pdfManipulation as pdf
 import src.exceptions as expt
 import global_var
-import src.check_csv as check_csv
+import mysql_connect
 
 base_url = "https://api.cardtrader.com/api/v2"
 game = "Magic"
@@ -54,13 +54,13 @@ def fetch_local_card_data():
     if price_csw.is_file():
         print("... card price csv file found!")
     else:
-        price_csw = open(global_var.custom_dir + "/price.csv", "x")
-        price_csw.writelines(
+        price_csv = open(global_var.custom_dir + "/price.csv", "x")
+        price_csv.writelines(
             [
                 "name,exp,min_price,max_price,mean_price,foil_min_price,foil_max_price,foil_mean_price,signed_min_price,signed_max_price,signed_mean_price,altered_min_price,altered_max_price,altered_mean_price\n"
             ]
         )
-        price_csw.close()
+        price_csv.close()
         print("... card price csv file created!")
     return True
 
@@ -106,23 +106,24 @@ def main(render=True):
     if result:
         print("finished prelim action")
         try:
-            check_csv.check_card_csv(home_dir + "/card.csv")
+            import mysql.connector
+
+            cards_list = mysql_connect.return_cards_list()
             print("Fetching card info...")
-            csv_file = rwCsw.read_csv(home_dir + "/card.csv")
             # TODO: check csv compleatness
-            for elem in range(len(csv_file["card"])):
+            for elem in card_list:
                 try:
-                    if csv_file["expansion"][elem] != None:
+                    if elem[1] != None:
                         nwrk.search_for_card(
-                            csv_file["card"][elem],
-                            csv_file["expansion"][elem],
+                            elem[0],
+                            elem[1],
                             database_url,
                             base_url,
                             headers,
                         )
                     else:
                         nwrk.search_for_card(
-                            csv_file["card"][elem],
+                            elem[0],
                             None,
                             database_url,
                             base_url,
