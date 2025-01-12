@@ -4,6 +4,7 @@ import calendar
 
 import src.exceptions as expt
 import src.rwCsw as rwCsw
+import src.log_msg as logMsg
 
 """ return the price in the latest month time frame
     card_info: complete list of card information with card name and expansion
@@ -14,7 +15,7 @@ import src.rwCsw as rwCsw
 def render_prices_month(card_info, list_elem):
     import mysql.connector
 
-    print("...render latest month prices")
+    logMsg.loggin_messages("...render latest month prices")
 
     database = mysql.connector.connect(
         host="localhost", user="root", password="cul5ai2xnsgs"
@@ -70,7 +71,7 @@ def render_prices_month(card_info, list_elem):
 def render_stock_month(card_info, list_elem):
     import mysql.connector
 
-    print("...render latest month prices")
+    logMsg.loggin_messages("...render latest month prices")
 
     database = mysql.connector.connect(
         host="localhost", user="root", password="cul5ai2xnsgs"
@@ -79,7 +80,7 @@ def render_stock_month(card_info, list_elem):
     mycursor = database.cursor()
     mycursor.execute("USE cards_database;")
 
-    print("...render latest month stock for " + str(card_info[0]))
+    logMsg.loggin_messages("...render latest month stock for " + str(card_info[0]))
 
     tod = datetime.datetime.now().date()
     delta = datetime.timedelta(days=30)

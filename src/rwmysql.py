@@ -5,6 +5,7 @@ from datetime import date
 import mysql.connector
 
 import src.exceptions as expt
+import src.log_msg as logMsg
 
 
 def write_stock_csv(name, stocks, expansion_name):
@@ -57,7 +58,7 @@ def write_stock_csv(name, stocks, expansion_name):
 
 
 def write_to_csv(name, expansion_code, prices):
-    print("write data to csv")
+    logMsg.loggin_messages("write data to csv")
     database = mysql.connector.connect(
         host="localhost", user="root", password="cul5ai2xnsgs"
     )

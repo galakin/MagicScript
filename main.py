@@ -7,6 +7,7 @@ import argparse
 import sys
 
 import connect
+import src.log_msg as logMsg
 
 # Check if configuration exist
 def check_config():
@@ -18,7 +19,7 @@ def check_config():
     if os.path.exists(home_dir + "/.config/magicscript"):
         return True
     else:
-        print(
+        logMsg.loggin_messages(
             'Unable to fing config file\nConfig script with "--config" flags or use "--config-file"'
         )
         return False

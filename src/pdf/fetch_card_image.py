@@ -5,24 +5,22 @@ import pandas
 import json
 
 import src.exceptions as expt
+import src.log_msg as logMsg
 import global_var as gvar
 
 # database_url = "https://api.scryfall.com"
 
 
-
 def fetch_card_image(card_info, card_set=None):
     card_name = card_info[0]
-
 
     if card_name == None or card_name == "":
         raise expt.InternalException("Unable to determine card name")
 
-    print("...Retriving card image")
+    logMsg.loggin_messages(f"...Retriving card image")
     if card_set == None:
         card_json = requests.get(gvar.database_url + "/cards/named?exact=" + card_name)
 
-    # print("card statud code:" + str(card_json.status_code))
     if card_json.status_code == 200:
         card_url = card_json.json()["image_uris"]["normal"]
         response = requests.get(card_url)
@@ -41,7 +39,7 @@ def fetch_card_image(card_info, card_set=None):
 
 
 def cleanup():
-    print("...clean up image directory")
+    logMsg.loggin_messages(f"...clean up image directory")
     # os.removedirs(gvar.custom_dir + "images/card_tmp/")
 
 

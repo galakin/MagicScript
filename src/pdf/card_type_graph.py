@@ -10,11 +10,14 @@ import matplotlib.pyplot as plt
 import src.rwCsw as rwCsw
 import src.stocks as stocks
 import src.dateRender as drender
+import src.log_msg as logMsg
 import global_var
 
 
 def card_graph(card_info, pdf, card_type):
-    print("...Generating " + card_type + ' graph for: "' + str(card_info[0]) + '"')
+    logMsg.loggin_messages(
+        f'...Generating {card_type} graph for: "{str(card_info[0])}"'
+    )
 
     filter_card_prices = drender.render_prices_month(
         card_info,

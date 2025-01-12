@@ -12,13 +12,14 @@ import src.dateRender as drender
 import src.pdf.cardInfo as cardInfo
 import src.pdf.card_type_graph as cg
 import src.pdf.stock_page as sg
+import src.log_msg as logMsg
 import global_var
 
 
 def generate_stocks_page(pdf, card_info):
     # Add new page to avoid graph collision
     pdf.add_page()
-    print("...Generate " + card_info[0] + " stock page")
+    logMsg.loggin_messages(f"...Generate {card_info[0]} stock page")
     home_dir = os.getenv("HOME")
     filter_price_csw = drender.render_stock_month(
         card_info, ["stocks", "foil", "signed", "altered", "stock_date"]

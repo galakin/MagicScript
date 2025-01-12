@@ -14,6 +14,7 @@ import src.connection as nwrk
 
 import src.pdfManipulation as pdf
 import src.exceptions as expt
+import src.log_msg as logMsg
 import global_var
 
 
@@ -30,7 +31,7 @@ def fetch_local_card_data():
         if elem[0] == "cards_database":
             find_db = True
     if find_db:
-        print("...cards db found")
+        logMsg.loggin_messages("...cards db found")
         mycursor.execute("USE cards_database;")
         mycursor.execute(
             "CREATE TABLE IF NOT EXISTS `card_info`(card varchar(255), expansion varchar(255), card_condition varchar(255))"
@@ -47,7 +48,7 @@ def fetch_local_card_data():
             check_cards_data_update()
 
     else:
-        print("...Unable to find cards db")
+        logMsg.loggin_messages("...Unable to find cards db")
         mycursor.execute("CREATE DATABASE cards_database")
         database.commit()
         mycursor.execute(
