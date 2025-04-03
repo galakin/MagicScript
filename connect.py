@@ -15,6 +15,7 @@ import src.pdfManipulation as pdf
 import src.exceptions as expt
 import global_var
 import mysql_connect
+import src.log_msg as logMsg
 
 base_url = "https://api.cardtrader.com/api/v2"
 game = "Magic"
@@ -22,11 +23,8 @@ game = "Magic"
 
 database_url = "https://api.scryfall.com"
 
-# print("Fetching auth token...")
-# print("auth token env: ", os.getenv("AUTH_TOKEN"))
 if os.getenv("AUTH_TOKEN") != None:
     auth_token = os.getenv("AUTH_TOKEN")
-#    print("...Auth token fetched from environment variables")
 
 else:
     raise expt.InternalException("Unable to find auth token!")
@@ -45,14 +43,14 @@ def fetch_local_card_data():
     price_csv = pathlib.Path(global_var.custom_dir + "/price.csv")
     file_path = pathlib.Path(home_dir + "/card.csv")
     if file_path.is_file():
-        print("Card file found!")
+        logMsg.loggin_messages("Card file found!")
     else:
         raise expt.InternalException(
             "Unable to fin the card file a the default location!"
         )
         return False
     if price_csv.is_file():
-        print("... card price csv file found!")
+        logMsg.loggin_messages("... card price csv file found!")
     else:
         price_csv = open(global_var.custom_dir + "/price.csv", "x")
         price_csv.writelines(
@@ -61,7 +59,7 @@ def fetch_local_card_data():
             ]
         )
         price_csv.close()
-        print("... card price csv file created!")
+        logMsg.loggin_messages("... card price csv file created!")
     return True
 
 
@@ -76,7 +74,7 @@ def preliminary_action():
 
     else:
         if global_var.custom_dir == "":
-            print("...Fetching files dir")
+            logMsg.loggin_messages("...Fetching files dir")
             with open(home_dir + "/.config/magicscript/config.yaml", "r") as stream:
                 try:
                     config = yaml.safe_load(stream)
@@ -85,25 +83,25 @@ def preliminary_action():
                     global_var.custom_name = config["custom_name"]
                     global_var.storage_method = config["storage_method"]
                 except yaml.YAMLError as e:
-                    print(e)
+                    logMsg.loggin_messages(f"{e}")
     found_game = False
     if global_var.storage_method == "csv":
         if fetch_local_card_data():
             response = requests.get(base_url + "/games", headers=headers)
             for elem in response.json()["array"]:
                 if elem["name"] == game:
-                    print("Selected game found!")
+                    logMsg.loggin_messages("Selected game found!")
                     found_game = True
             if found_game == False:
                 raise expt.InternalException("Unable to find selected Game")
                 return False
     elif global_var.storage_method == "mysql":
-        print("Using mysql db as backend")
+        logMsg.loggin_messages("Using mysql db as backend")
         mysql_connect.fetch_local_card_data()
         response = requests.get(base_url + "/games", headers=headers)
         for elem in response.json()["array"]:
             if elem["name"] == game:
-                print("Selected game found!")
+                logMsg.loggin_messages("Selected game found!")
                 found_game = True
         if found_game == False:
             raise expt.InternalException("Unable to find selected Game")
@@ -113,14 +111,14 @@ def preliminary_action():
 
 def main(render=True):
     nwrk.verify_connection(base_url, headers)
-i    result = preliminary_action()
+    result = preliminary_action()
     if result:
-        print("finished prelim action")
+        logMsg.loggin_messages("finished prelim action")
         try:
             import mysql.connector
 
             cards_list = mysql_connect.return_cards_list()
-            print("Fetching card info...")
+            logMsg.loggin_messages("Fetching card info...")
 
             # TODO: check csv compleatness
             for elem in cards_list:

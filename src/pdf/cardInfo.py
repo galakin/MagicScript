@@ -20,23 +20,22 @@ import src.pdf.fetch_card_image as fci
 
 
 def generate_info(pdf, card_info):
-
     # retrive info for card stock
-
     filter_stock_csw = drender.render_stock_month(
         card_info, ["stocks", "foil", "signed", "altered", "stock_date"]
     )
     start_stock = filter_stock_csw["stocks"][0]
-    end_stock = filter_stock_csw["stocks"][len(filter_stock_csw) - 1]
+
+    end_stock = filter_stock_csw["stocks"][-1]
 
     #          date  stock  foil  signed  altered
     start_foil, end_foil = (
         filter_stock_csw["foil"][0],
-        filter_stock_csw["foil"][len(filter_stock_csw) - 1],
+        filter_stock_csw["foil"][-1],
     )
     start_signed, end_signed = (
         filter_stock_csw["signed"][0],
-        filter_stock_csw["signed"][len(filter_stock_csw) - 1],
+        filter_stock_csw["signed"][-1],
     )
 
     # retrive info for card prices
@@ -50,9 +49,9 @@ def generate_info(pdf, card_info):
         filter_price_csw["mean_price"][0],
     )
     end_min, end_max, end_mean = (
-        filter_price_csw["min_price"][len(filter_price_csw) - 1],
-        filter_price_csw["max_price"][len(filter_price_csw) - 1],
-        filter_price_csw["mean_price"][len(filter_price_csw) - 1],
+        filter_price_csw["min_price"][-1],
+        filter_price_csw["max_price"][-1],
+        filter_price_csw["mean_price"][-1],
     )
 
     if end_stock == 0:
@@ -271,9 +270,7 @@ def generate_info(pdf, card_info):
     )
 
     pdf.image(
-
         global_var.custom_dir + "images/card_tmp/" + card_info[0] + "_image.jpg",
-      
         x=130,
         y=40,
         w=0,

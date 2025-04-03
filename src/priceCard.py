@@ -70,8 +70,6 @@ def get_prices(seller_list, item_tag):
         return tmp_map
     except expt.InternalException as ex:
         print(ex)
-        print("env, item_tag: ", item_tag)
-        # print("seller list: " + str(seller_list[item_tag][0]))
         exit(-1)
 
 
@@ -105,7 +103,6 @@ def extract_default(seller_list, item_tag):
             altered_list.append(seller_list[item_tag][elem])
 
     # properties_hash
-    # print(seller_list[item_tag][0])
 
     return {
         "default_list": default_list,
