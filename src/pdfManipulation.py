@@ -42,7 +42,7 @@ class PDF(fpdf.FPDF):
         # Centered text in a framed 20*10 mm cell and line break
 
         self.cell(60, 10, "Report of cards prices", 0, 1)
-        self.cell(60, 10, "Price updatae at: " + str(date.today()), 0, 1)
+        self.cell(60, 10, "Price updated last time at: " + str(date.today()), 0, 1)
 
         # if render :
         if os.path.exists(global_var.custom_dir + "/images") == False:
@@ -65,7 +65,7 @@ class PDF(fpdf.FPDF):
                 "Unable to find the correct no of graph images during PDF cretion!"
             )
             exit(-1)
-        self.cell(60, 10, "Price for " + str(elem), 0, 1)
+        self.cell(60, 10, "Price for " + str(elem[0]), 0, 1)
         self.image(images[0], 15, 65, self.WIDTH - 30)
         self.image(images[1], 15, self.WIDTH / 2 + 35, self.WIDTH - 30)
         self.image(images[2], 15, self.WIDTH, self.WIDTH - 30)
@@ -116,7 +116,7 @@ class PDF(fpdf.FPDF):
         if os.path.isdir(global_var.custom_dir + "/images/") == False:
             raise expt.InternalException(
                 "Unable to find directory with name: "
-                + str(global_var.custom_dir + "//images/")
+                + str(global_var.custom_dir + "/images/")
             )
             exit(-1)
 
