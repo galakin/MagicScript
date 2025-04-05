@@ -8,6 +8,7 @@ import sys
 
 import connect
 import src.log_msg as logMsg
+import src.exceptions as expt
 
 # Check if configuration exist
 def check_config():

@@ -5,5 +5,5 @@ matplotlib
 pytest
 PyYAML
 pyarrow
-calendar
 logging
+mysql-connector-python
