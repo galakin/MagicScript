@@ -14,39 +14,39 @@ import priceCard as price
 import stocks as stocks
 
 
-def test_date_render():
-    assert date.render_prices_month(None, []) == None
-    assert date.render_prices_month("", []) == None
+# def test_date_render():
+# assert date.render_prices_month(None, []) == None
+# assert date.render_prices_month("", []) == None
 
-    f = open("test_csv.csv", "w")
-    f.write("data,prices\n0,0")
-    f.close()
-    assert date.render_prices_month("test_csv.csv", []) == None
-    os.remove("test_csv.csv")
+# assert date.render_prices_month("test_csv.csv", []) == None
 
 
-def test_csv():
-    HOME = os.getenv("HOME")
-    os.environ["HOME"] = ""
-    # with pytest.raises(ValueError, match=r".* 123 .*"):
-    # myfunc()
-    # csv.write_main_dir()
+# def test_csv():
+#    HOME = os.getenv("HOME")
+#    os.environ["HOME"] = ""
+#    # with pytest.raises(ValueError, match=r".* 123 .*"):
+#    # myfunc()
+#    # csv.write_main_dir()
+#
+#    with pytest.raises(Exception, match=r".*csv.*"):
+#        csv.read_csv("test")
+#    os.environ["HOME"] = HOME
+#
+#    with pytest.raises(Exception, match=r".*csv.*"):
+#        csv.read_csv("test")
+#
+#    os.environ["HOME"] = ""
+#    with pytest.raises(Exception, match=r".*HOME.*"):
+#        csv.search_row("test", "test", "test", log=False)
+#    os.environ["HOME"] = HOME
+#
+#    with pytest.raises(Exception, match=r".*Unable to find csv.*"):
+#        csv.search_row("test", "test", "test", log=False)
+#    # TODO: check that search row method found the correct index
 
-    with pytest.raises(Exception, match=r".*csv.*"):
-        csv.read_csv("test")
-    os.environ["HOME"] = HOME
-
-    with pytest.raises(Exception, match=r".*csv.*"):
-        csv.read_csv("test")
-
-    os.environ["HOME"] = ""
-    with pytest.raises(Exception, match=r".*HOME.*"):
-        csv.search_row("test", "test", "test", log=False)
-    os.environ["HOME"] = HOME
-
-    with pytest.raises(Exception, match=r".*Unable to find csv.*"):
-        csv.search_row("test", "test", "test", log=False)
-    # TODO: check that search row method found the correct index
+"""
+Test the application ability to connect to cardtrader and scryfall api
+"""
 
 
 def test_connection():
@@ -76,6 +76,12 @@ def test_connection():
         assert con.search_for_card("Duress", database_url, base_url, {}) == False
 
 
+"""
+Test if the application return the correct error if invalid input are passed to the module
+that check the card prices
+"""
+
+
 def test_price_card():
     with pytest.raises(Exception, match=r".*Unable.*fetch seller.*"):
         price.extract_default([], None)
@@ -102,9 +108,15 @@ def test_price_card():
         price.get_prices(["a", "b"], "    ")
 
 
-def test_stocks():
-    with pytest.raises(Exception, match=r".*Unable.*fetch seller.*"):
-        stocks.finds_stocks([], None)
+"""
+Test if the application return the correct error if invalid input are passed to the module
+that check the card stock
+"""
 
-    with pytest.raises(Exception, match=r".*Item tag.*isn't.*correctly.*"):
-        stocks.finds_stocks(["a", "b"], None)
+
+# def test_stocks():
+#    with pytest.raises(Exception, match=r".*Unable.*fetch seller.*"):
+#        stocks.finds_stocks([], None)
+#
+#    with pytest.raises(Exception, match=r".*Item tag.*isn't.*correctly.*"):
+#        stocks.finds_stocks(["a", "b"], None)

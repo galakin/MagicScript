@@ -13,6 +13,7 @@ import src.pdf.cardInfo as cardInfo
 import src.pdf.card_type_graph as cg
 import src.pdf.stock_page as sg
 import src.log_msg as logMsg
+import src.exceptions as expt
 import global_var
 
 

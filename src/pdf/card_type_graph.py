@@ -11,6 +11,7 @@ import src.rwCsw as rwCsw
 import src.stocks as stocks
 import src.dateRender as drender
 import src.log_msg as logMsg
+import src.exceptions as expt
 import global_var
 
 
