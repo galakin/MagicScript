@@ -73,7 +73,11 @@ def get_prices(seller_list, item_tag):
         exit(-1)
 
 
-# Extract the price for the `default` item, where default means no foil, nor signed or altered
+"""
+Extract the price for the `default` item, where default means no foil, nor signed or altered
+"""
+
+
 def extract_default(seller_list, item_tag):
     if len(seller_list) == 0:
         raise expt.InternalException(

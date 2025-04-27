@@ -13,6 +13,7 @@ import src.pdf.cardInfo as cardInfo
 import src.pdf.card_type_graph as cg
 import src.pdf.stock_page as sg
 import src.exceptions as expt
+import src.pdf.general_index as gi
 import global_var
 
 
@@ -32,6 +33,8 @@ class PDF(fpdf.FPDF):
         self.WIDTH = 210
         self.HEIGHT = 297
 
+    """ main method for generating the pdf file"""
+
     def generate_file(
         self,
         csv_file,
@@ -45,17 +48,21 @@ class PDF(fpdf.FPDF):
         self.cell(60, 10, "Report of cards prices", 0, 1)
         self.cell(60, 10, "Price updatae at: " + str(date.today()), 0, 1)
 
-        # if render :
         if os.path.exists(global_var.custom_dir + "/images") == False:
             os.mkdir(global_var.custom_dir + "/images")
         is_first_page = True
+
+        # Create the first page general index
+        if global_var.general_index == True:
+            gi.general_index(self, csv_file)
+
         for elem in csv_file:
             self.generate_graph(elem, is_first_page)
             for type in global_var.general_graph_type:
                 cg.card_graph(elem, self, type)
             sg.generate_stocks_page(self, elem)
             cardInfo.generate_info(self, elem)
-
+            #
             self.add_page()
             if is_first_page == True:
                 is_first_page = False
