@@ -82,9 +82,12 @@ def preliminary_action():
                     global_var.custom_output = config["custom_output"]
                     global_var.custom_name = config["custom_name"]
                     global_var.storage_method = config["storage_method"]
+                    global_var.genera_index = config["storage_method"]
                 except yaml.YAMLError as e:
                     logMsg.loggin_messages(f"{e}")
     found_game = False
+
+    # check for the csv storage method [archived]
     if global_var.storage_method == "csv":
         if fetch_local_card_data():
             response = requests.get(base_url + "/games", headers=headers)
@@ -95,6 +98,8 @@ def preliminary_action():
             if found_game == False:
                 raise expt.InternalException("Unable to find selected Game")
                 return False
+
+    # check for the mysql storage method
     elif global_var.storage_method == "mysql":
         logMsg.loggin_messages("Using mysql db as backend")
         mysql_connect.fetch_local_card_data()

@@ -32,6 +32,8 @@ class PDF(fpdf.FPDF):
         self.WIDTH = 210
         self.HEIGHT = 297
 
+    """ main method for generating the pdf file"""
+
     def generate_file(
         self,
         csv_file,
@@ -59,6 +61,9 @@ class PDF(fpdf.FPDF):
             self.add_page()
             if is_first_page == True:
                 is_first_page = False
+
+        if global_var.genera_index:
+            None
 
     def first_page(self, images, elem):
         if len(images) < 3:
