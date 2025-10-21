@@ -10,7 +10,9 @@ import connect
 import src.log_msg as logMsg
 import src.exceptions as expt
 
-# Check if configuration exist
+"""Check if configuration exist"""
+
+
 def check_config():
     home_dir = os.getenv("HOME")
     if home_dir == None:
@@ -26,7 +28,9 @@ def check_config():
         return False
 
 
-# Create and populate magicscript config file
+"""Create and populate magicscript config file"""
+
+
 def config_script():
     check_semantic = False
     config_map = {}
@@ -126,6 +130,22 @@ def config_script():
 
     # set fetch info rate
     f.write('fetch_rate: "daily"\n')
+    print(
+        '...Wrote config to "'
+        + home_dir
+        + '/.config/magicscript/config.yaml" directory'
+    )
+
+    while check_semantic == False:
+        prompt_input = input("Create general index for card price and stocks? [Y/n]: ")
+        if prompt_input.lower() == "y" or prompt_input.lower() == "n":
+            check_semantic = True
+        else:
+            print('Please enter "Y" or "n"')
+
+    config_map["general_index"] = prompt_input.lower()
+    f.write(f"general_index: {prompt_input.lower()}\n")
+
     f.close()
     print(
         '...Wrote config to "'
