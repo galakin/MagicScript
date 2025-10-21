@@ -10,6 +10,7 @@ import matplotlib.pyplot as plt
 import src.rwmysql as rwm
 import src.stocks as stocks
 import src.dateRender as drender
+import src.exceptions as expt
 import global_var
 
 """
@@ -26,8 +27,6 @@ def general_index(pdf, csv_file):
 
 def price_page(pdf, csv_file):
     # print(csv_file)
-
-    collection = [0, 0, 0]
 
     collection = [
         {0: 0, 1: "Min", 2: []},
