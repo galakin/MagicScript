@@ -30,7 +30,7 @@ def check_config():
         return False
 
 
-"""Create and populate magicscript config file"""
+"""Create and populate magicscript config file while asking for use prompt to configure the script behaviour"""
 
 
 def config_script():
@@ -140,13 +140,27 @@ def config_script():
 
     while check_semantic == False:
         prompt_input = input("Create general index for card price and stocks? [Y/n]: ")
-        if prompt_input.lower() == "y" or prompt_input.lower() == "n":
+        if prompt_input.lower() == "y":
+            check_semantic = True
+            config_map["general_index"] = True
+            f.write(f"general_index: True\n")
+        elif prompt_input.lower() == "n":
             check_semantic = True
         else:
             print('Please enter "Y" or "n"')
 
-    config_map["general_index"] = prompt_input.lower()
-    f.write(f"general_index: {prompt_input.lower()}\n")
+    check_semantic = False
+    while check_semantic == False:
+        prompt_input = input("Create general index for card price and stocks? [Y/n]: ")
+        if prompt_input.lower() == "y":
+            check_semantic = True
+            config_map["cleanup"] = True
+            f.write(f"cleanup: True\n")
+
+        elif prompt_input.lower() == "n":
+            check_semantic = True
+        else:
+            print('Please enter "Y" or "n"')
 
     f.close()
     print(

@@ -5,5 +5,5 @@ general_graph_type = ["foil", "altered", "signed"]
 database_url = "https://api.scryfall.com"
 storage_method = None
 general_index = False
-cleanup = True
+cleanup = False
 # fetch_rate = None
