@@ -33,6 +33,11 @@ you can proceed with the execution of the script core
 In alternative you can provide a `.yaml` file with your desired configuration
 
 If you need any help you could use the `--help` command
+
+### Command Line Options
+`--cleanup`: start the linked Database cleanup process that remove and merge old items that are not needed anymore.
+by default this process don't consider items younger than 3 month
+
 ## Usage
 Simply execute the `main.py` file with Pythone
 ```
