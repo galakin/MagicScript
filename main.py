@@ -9,6 +9,8 @@ import sys
 import connect
 import src.log_msg as logMsg
 import src.exceptions as expt
+import src.cleanup.main as cleanup
+
 
 """Check if configuration exist"""
 
@@ -169,7 +171,8 @@ if __name__ == "__main__":
             + " from the famous Card Trader web site!\nThe following is a list of flags"
             + ' supported by the script:\n - "--quiet": suppress the pdf creation\n -'
             + ' "--config  ": set the script config\n - "--config-file": pass the config'
-            + " file directly to the script"
+            + ' file directly to the script\n - "--cleanup": lauch the DB cleanup process, this'
+            + " is enabled by default for the price and stock fetch runs"
         )
         exit()
 
@@ -182,3 +185,10 @@ if __name__ == "__main__":
         render = False
         if check_config():
             connect.main(render)
+
+    elif any(item in sys.argv for item in sys.argv if item == "--cleanup"):
+        cleanup.main()
+        exit()
+
+    else:
+        raise Exception(f"Unable to find arguments: {sys.argv}!")
