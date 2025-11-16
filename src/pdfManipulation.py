@@ -73,7 +73,7 @@ class PDF(fpdf.FPDF):
                 "Unable to find the correct no of graph images during PDF cretion!"
             )
             exit(-1)
-        self.cell(60, 10, "Price for " + str(elem), 0, 1)
+        self.cell(60, 10, "Price for " + str(elem[0]), 0, 1)
         self.image(images[0], 15, 65, self.WIDTH - 30)
         self.image(images[1], 15, self.WIDTH / 2 + 35, self.WIDTH - 30)
         self.image(images[2], 15, self.WIDTH, self.WIDTH - 30)
@@ -91,10 +91,10 @@ class PDF(fpdf.FPDF):
             self.image(images[2], 15, self.WIDTH, self.WIDTH - 30)
         elif len(images) == 4:
             self.cell(60, 10, str(elem) + " stocks", 0, 1)
-            self.image(images[0], x=15, y=50, w=self.WIDTH - 80)
-            self.image(images[1], 15, (self.WIDTH / 2) - 2, w=self.WIDTH - 80)
-            self.image(images[2], 15, self.WIDTH - 50, self.WIDTH - 80)
-            self.image(images[3], 15, self.WIDTH + 5, self.WIDTH - 80)
+            self.image(images[0], 15, w=self.WIDTH - 50)
+            self.image(images[1], 15, w=self.WIDTH - 50)
+            self.image(images[2], 15, w=self.WIDTH - 50)
+            self.image(images[3], 15, w=self.WIDTH - 50)
 
     def generate_graph(self, elem, is_first_page):
         # TODO: add expension code eg 'ONE'
