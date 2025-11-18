@@ -73,7 +73,7 @@ def preliminary_action():
 
     else:
         if global_var.custom_dir == "":
-            logMsg.loggin_messages("...Fetching files dir")
+            logMsg.loggin_messages("Fetching files dir")
             with open(home_dir + "/.config/magicscript/config.yaml", "r") as stream:
                 try:
                     config = yaml.safe_load(stream)
@@ -82,6 +82,7 @@ def preliminary_action():
                     global_var.custom_name = config["custom_name"]
                     global_var.storage_method = config["storage_method"]
                     global_var.general_index = config["general_index"]
+                    global_var.cleanup = config["cleanup"]
                 except yaml.YAMLError as e:
                     logMsg.loggin_messages(f"{e}")
     found_game = False
@@ -111,6 +112,11 @@ def preliminary_action():
             raise expt.InternalException("Unable to find selected Game")
             return False
     return True
+
+
+"""
+Script main method that launch the various flow of the application based on the previously generated configuration and setting
+"""
 
 
 def main(render=True):
@@ -149,6 +155,5 @@ def main(render=True):
                 pdf.generate_pdf_report(cards_list)
 
         except expt.InternalException as ex:
-            print("unexpected error")
             print(ex)
-            exit()
+            exit(-1)
