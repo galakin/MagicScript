@@ -28,6 +28,8 @@ def main():
         password = retrieved_credentials[1]
     else:
         password = "cul5ai2xnsgs"
+
+    logMsg.loggin_messages("Connecting to database...")
     database = mysql.connector.connect(
         host="localhost", user=username, password=password
     )
@@ -45,25 +47,30 @@ retrive the database credentials either by environment variable, command line va
 def get_credentials():
     logMsg.loggin_messages("Retrieve database credentials")
     try:
-        username = os.environ("MAGIC_DB_USERNAME")
-        password = os.environ("MAGIC_DB_PASSWORD")
+        username = os.getenv("MAGIC_DB_USERNAME")
+        password = os.getenv("MAGIC_DB_PASSWORD")
         if username == None:
             item_count = 0
             stop_loop = False
-            for item in sys.argv and not stop_loop:
-                item_count += 1
-                if item == "--dbuser":
-                    stop_loop = True
-            username = sys.argv[item_count + 1]
+            for item in sys.argv:
+                if not stop_loop:
+                    item_count += 1
+                    if item == "--dbuser":
+                        stop_loop = True
+            if stop_loop:
+                username = sys.argv[item_count + 1]
         if password == None:
-            item_count += 1
+            item_count = 0
             stop_loop = False
-            for item in sys.argv and not stop_loop:
-                if item == "--dbpassword":
-                    stop_loop = True
-            password = sys.argv[item_count + 1]
-        reteurn[username, password]
+            for item in sys.argv:
+                if not stop_loop:
+                    item_count += 1
+                    if item == "--dbpassword":
+                        stop_loop = True
+            if stop_loop:
+                password = sys.argv[item_count + 1]
+        return [username, password]
 
-    except exception:
-        print(exception)
+    except Exception as e:
+        print(e)
         return -1
