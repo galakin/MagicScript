@@ -1,3 +1,7 @@
+
+![Python](https://img.shields.io/badge/python-3.13-blue.svg)
+![Repo Size](https://img.shields.io/github/repo-size/Sulstice/global-chem)
+
 ### Magic Script
 A simple Python script to fetch, store and analize the MTG cards price
 over time using external API
