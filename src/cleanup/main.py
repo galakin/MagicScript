@@ -21,11 +21,6 @@ def return_cards_list(username, password):
     database = mysql.connector.connect(
         host="localhost", user=username, password=password
     )
-    last_year = datetime(
-        datetime.now().year - 1, datetime.now().month, datetime.now().day
-    )
-    last_year_epoch = calendar.timegm(last_year.timetuple())
-    print(f"{last_year} -- {last_year_epoch}")
     try:
         mycursor = database.cursor()
         mycursor.execute("USE cards_database;")
@@ -40,6 +35,7 @@ def return_cards_list(username, password):
 
 
 def main():
+    # TODO: extract username and password from env
     username = ""  # database username
     password = ""  # database password
     logMsg.loggin_messages("Starting the Database cleanup process")
@@ -55,10 +51,11 @@ def main():
         password = "cul5ai2xnsgs"
 
     card_list = return_cards_list(username, password)
-    print(card_list)
 
     try:
-        cleanPrice.clean_price()
+        for elem in card_list:
+            print(f"{elem[0]} - {elem[1]}")
+            remove_year_old_entry(elem[0], elem[1])
     except Exception as e:
         print(e)
         return -1
@@ -73,6 +70,30 @@ def main():
     #
     #    month_epoch_delta = 0
 
+    return 0
+
+
+"""
+Remove entry older than 1 year and merge them in one entry for every 3 month
+card_name: name of the single card that it's used for search entry on the main database
+"""
+
+
+def remove_year_old_entry(card_name, card_set):
+    last_year = datetime(
+        datetime.now().year - 1, datetime.now().month, datetime.now().day
+    )
+    last_year_epoch = calendar.timegm(last_year.timetuple())
+    # print(f"{last_year} -- {last_year_epoch}")
+
+    table_name = (
+        card_name.lower().replace(" ", "_", card_name.count(""))
+        + "_"
+        + card_set
+        + "_price"
+    )
+    # print(table_name)
+    cleanPrice.clean_price(table_name, last_year_epoch, "YEAR")
     return 0
 
 
