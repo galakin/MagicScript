@@ -2,16 +2,41 @@ import json
 import sys
 import yaml
 import os
+from datetime import datetime
+import calendar
 import mysql.connector
 
 import src.exceptions as expt
 import global_var
 import mysql_connect
 import src.log_msg as logMsg
+import src.cleanup.clean_price as cleanPrice
 
 """
 Start the Database cleanup process that remove entry older than 3 month
 """
+
+
+def return_cards_list(username, password):
+    database = mysql.connector.connect(
+        host="localhost", user=username, password=password
+    )
+    last_year = datetime(
+        datetime.now().year - 1, datetime.now().month, datetime.now().day
+    )
+    last_year_epoch = calendar.timegm(last_year.timetuple())
+    print(f"{last_year} -- {last_year_epoch}")
+    try:
+        mycursor = database.cursor()
+        mycursor.execute("USE cards_database;")
+        mycursor.execute("SELECT * FROM card_info;")
+        return_list = []
+        for elem in mycursor:
+            return_list.append(elem)
+        return return_list
+    except Exception as e:
+        print(e)
+        exit(-1)
 
 
 def main():
@@ -29,13 +54,25 @@ def main():
     else:
         password = "cul5ai2xnsgs"
 
-    logMsg.loggin_messages("Connecting to database...")
-    database = mysql.connector.connect(
-        host="localhost", user=username, password=password
-    )
+    card_list = return_cards_list(username, password)
+    print(card_list)
 
-    mycursor = database.cursor()
-    mycursor.execute("USE cards_database;")
+    try:
+        cleanPrice.clean_price()
+    except Exception as e:
+        print(e)
+        return -1
+
+    #    logMsg.loggin_messages("Connecting to database...")
+    #    database = mysql.connector.connect(
+    #        host="localhost", user=username, password=password
+    #    )
+    #
+    #    mycursor = database.cursor()
+    #    mycursor.execute("USE cards_database;")
+    #
+    #    month_epoch_delta = 0
+
     return 0
 
 
