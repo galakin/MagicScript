@@ -39,10 +39,23 @@ def clean_price(card_table, time_epoch, paramether):
                 sorted_result = sorted(results, key=lambda x: x[12])
                 bottom_end_epoch = sorted_result[0][12]
 
-                delta_time = 1000
-                while (time_epoch - delta_time) > bottom_end_epoch:
-                    time_epoch = time_epoch - delta_time
-                    None
+                init_mont = 0
+                target_date = datetime(
+                    datetime.now().year - 1, datetime.now().month, datetime.now().day
+                )
+                delta_time = target_date - relativedelta(months=init_mont)
+                print(delta_time)
+
+                while (target_date.timestamp() - bottom_end_epoch) > 0:
+                    init_mont += 3
+                    mycursor.execute(
+                        f"SELECT * FROM {card_table} WHERE price_date < {target_date.timestamp()} AND price_date >= {(target_date - relativedelta(months=init_mont)).timestamp()};"
+                    )
+                    results = mycursor.fetchall()
+                    # print(results)
+                    compact_data(results)
+                    target_date = target_date - relativedelta(months=init_mont)
+                    # time_epoch = time_epoch - 1000
                 print(bottom_end_epoch)
                 # for elem in sorted_result:
                 #    print(elem[12])
@@ -55,3 +68,16 @@ def clean_price(card_table, time_epoch, paramether):
         case "MONTH":
             None
     return 0
+
+
+def compact_data(extracted_data):
+    compact_result = [[]]
+    for single_entry in extracted_data:
+        for index in range(len(single_entry)):
+            None
+            # print(f"{index} of {len(single_entry)}")
+            # if compact_result
+            # compact_result[index]+=single_entry[index]
+        # print(elem)
+
+    return compact_result
