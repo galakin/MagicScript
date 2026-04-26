@@ -11,6 +11,7 @@ import global_var
 import mysql_connect
 import src.log_msg as logMsg
 import src.cleanup.clean_price as cleanPrice
+import src.cleanup.retrieve_db_credential as retrieveCredentials
 
 """
 Start the Database cleanup process that remove entry older than 3 month
@@ -36,21 +37,10 @@ def return_cards_list(username, password):
 
 def main():
     # TODO: extract username and password from env
-    username = ""  # database username
-    password = ""  # database password
     logMsg.loggin_messages("Starting the Database cleanup process")
+    creds = retrieveCredentials.retrieve_credentials("", "")
 
-    retrieved_credentials = get_credentials()
-    if retrieved_credentials[0] != None:
-        username = retrieved_credentials[0]
-    else:
-        username = "root"
-    if retrieved_credentials[1] != None:
-        password = retrieved_credentials[1]
-    else:
-        password = "cul5ai2xnsgs"
-
-    card_list = return_cards_list(username, password)
+    card_list = return_cards_list(creds[0], creds[1])
 
     try:
         for elem in card_list:
@@ -76,6 +66,7 @@ def main():
 """
 Remove entry older than 1 year and merge them in one entry for every 3 month
 card_name: name of the single card that it's used for search entry on the main database
+card_sat: the Magic set of the card, used to connect to the correct DB entry
 """
 
 
@@ -95,40 +86,3 @@ def remove_year_old_entry(card_name, card_set):
     # print(table_name)
     cleanPrice.clean_price(table_name, last_year_epoch, "YEAR")
     return 0
-
-
-"""
-retrive the database credentials either by environment variable, command line variable or by default setting
-"""
-
-
-def get_credentials():
-    logMsg.loggin_messages("Retrieve database credentials")
-    try:
-        username = os.getenv("MAGIC_DB_USERNAME")
-        password = os.getenv("MAGIC_DB_PASSWORD")
-        if username == None:
-            item_count = 0
-            stop_loop = False
-            for item in sys.argv:
-                if not stop_loop:
-                    item_count += 1
-                    if item == "--dbuser":
-                        stop_loop = True
-            if stop_loop:
-                username = sys.argv[item_count + 1]
-        if password == None:
-            item_count = 0
-            stop_loop = False
-            for item in sys.argv:
-                if not stop_loop:
-                    item_count += 1
-                    if item == "--dbpassword":
-                        stop_loop = True
-            if stop_loop:
-                password = sys.argv[item_count + 1]
-        return [username, password]
-
-    except Exception as e:
-        print(e)
-        return -1

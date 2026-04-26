@@ -128,6 +128,7 @@ def main(render=True):
             import mysql.connector
 
             cards_list = mysql_connect.return_cards_list()
+            print(cards_list)
             logMsg.loggin_messages("Fetching card info...")
 
             # TODO: check csv compleatness

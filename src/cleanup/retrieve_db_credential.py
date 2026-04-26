@@ -27,6 +27,11 @@ def retrieve_credentials(username, password):
     return (username, password)
 
 
+"""
+retrive the database credentials either by environment variable, command line variable or by default setting
+"""
+
+
 def get_credentials():
     logMsg.loggin_messages("Retrieve database credentials")
     try:

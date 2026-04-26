@@ -55,15 +55,17 @@ def price_page(pdf, csv_file):
                 map(add, price_elem["mean_price"], collection[2][2])
             )
 
-        # print(price_elem["min_price"][len(price_elem)-1])
+        print(price_elem["min_price"][len(price_elem["min_price"]) - 1])
+        # print(len(collection[0]))
         collection[0][0] = (
-            collection[0][0] + price_elem["min_price"][len(price_elem) - 1]
+            collection[0][0] + price_elem["min_price"][len(price_elem["min_price"]) - 1]
         )
         collection[1][0] = (
-            collection[1][0] + price_elem["max_price"][len(price_elem) - 1]
+            collection[1][0] + price_elem["max_price"][len(price_elem["max_price"]) - 1]
         )
         collection[2][0] = (
-            collection[2][0] + price_elem["mean_price"][len(price_elem) - 1]
+            collection[2][0]
+            + price_elem["mean_price"][len(price_elem["mean_price"]) - 1]
         )
 
     pdf.cell(60, 10, f"Cards watched: {len(csv_file)}", 0, 1)
@@ -145,10 +147,18 @@ def stock_page(pdf, csv_file):
             collection[3][2] = list(map(add, price_elem["altered"], collection[3][2]))
 
         # print(price_elem["min_price"][len(price_elem)-1])
-        collection[0][0] = collection[0][0] + price_elem["stock"][len(price_elem) - 1]
-        collection[1][0] = collection[1][0] + price_elem["foil"][len(price_elem) - 1]
-        collection[2][0] = collection[2][0] + price_elem["signed"][len(price_elem) - 1]
-        collection[3][0] = collection[3][0] + price_elem["altered"][len(price_elem) - 1]
+        collection[0][0] = (
+            collection[0][0] + price_elem["stock"][len(price_elem["stock"]) - 1]
+        )
+        collection[1][0] = (
+            collection[1][0] + price_elem["foil"][len(price_elem["foil"]) - 1]
+        )
+        collection[2][0] = (
+            collection[2][0] + price_elem["signed"][len(price_elem["signed"]) - 1]
+        )
+        collection[3][0] = (
+            collection[3][0] + price_elem["altered"][len(price_elem["altered"]) - 1]
+        )
 
     for elem in collection:
         plt.figure(figsize=(12, 4))
