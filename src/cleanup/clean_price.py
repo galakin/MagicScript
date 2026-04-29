@@ -16,7 +16,11 @@ import src.log_msg as logMsg
 import src.cleanup.retrieve_db_credential as retrieveCredentials
 
 
-"""Cleanup the price table for the selected card"""
+"""Cleanup the price table for the selected card
+    card_table: the table associated with the selected card
+    time_epoch: the starting time epoch
+    paramethers: if the cleanup need to be done on a yearly, monthly or weekly base
+"""
 
 
 def clean_price(card_table, time_epoch, paramether):
@@ -53,15 +57,27 @@ def clean_price(card_table, time_epoch, paramether):
                     )
                     results = mycursor.fetchall()
                     # print(results)
-                    compact_data(results)
+                    compact_result = compact_data(results)
+                    print(len(compact_result))
+                    #                    mycursor.execute(
+                    #                        f"DELETE FROM {card_table} (
+                    #                            WHERE price_date IN (0)
+                    #                        );"
+                    #                    )
+                    #                    mycursor.execute(
+                    #                        f"INSERT INTO {card_table} (
+                    #                            min_prices, max_prices, mean_prices, foil_min_prices, foil_max_prices, foil_mean_prices, signed_min_prices, signed_max_prices, signed_mean_prices,
+                    #                            alterd_min_prices, altered_max_prices, altered_mean_prices, price_date
+                    #                        )
+                    #                        VALUES (
+                    #                            {compact_data['0']}, {compact_data['1']}, {compact_data['2']}, {compact_data['3']}, {compact_data['4']}, {compact_data['5']},
+                    #                            {compact_data['6']}, {compact_data['7']}, {compact_data['8']}, {compact_data['9']}, {compact_data['10']}, {compact_data['11']},
+                    #                            {compact_data['12']}
+                    #                        );"
+                    #                    )
+                    # database.commit()
                     target_date = target_date - relativedelta(months=init_mont)
-                    # time_epoch = time_epoch - 1000
                 print(bottom_end_epoch)
-                # for elem in sorted_result:
-                #    print(elem[12])
-                # count = mycursor.rowcount
-                # print(f"Total rows returned: {count}")
-                # print(mycursVor)
             except Exception as e:
                 print(e)
                 exit(-1)
@@ -70,14 +86,19 @@ def clean_price(card_table, time_epoch, paramether):
     return 0
 
 
+# https://github.com/OWNER/REPOSITORY/actions/workflows/WORKFLOW-FILE/badge.svg
+
+
 def compact_data(extracted_data):
-    compact_result = [[]]
+    compact_result = {}
     for single_entry in extracted_data:
         for index in range(len(single_entry)):
-            None
-            # print(f"{index} of {len(single_entry)}")
-            # if compact_result
-            # compact_result[index]+=single_entry[index]
-        # print(elem)
+            if str(index) not in compact_result:
+                compact_result[str(index)] = single_entry[index]
+
+            else:
+                compact_result[str(index)] += single_entry[index]
+    for key in compact_result:
+        compact_result[key] = compact_result[key] / len(extracted_data)
 
     return compact_result
