@@ -57,13 +57,11 @@ def clean_price(card_table, time_epoch, paramether):
                     )
                     results = mycursor.fetchall()
                     # print(results)
-                    compact_result = compact_data(results)
-                    print(len(compact_result))
-                    #                    mycursor.execute(
-                    #                        f"DELETE FROM {card_table} (
-                    #                            WHERE price_date IN (0)
-                    #                        );"
-                    #                    )
+                    # check if there are more than one entry for the yearly time frame
+                    if not check_compacted_data(results):
+                        compact_result = compact_data(results)
+                        print(len(compact_result))
+                    # mycursor.execute(f"DELETE FROM {card_table} (WHERE price_date IN (0));")
                     #                    mycursor.execute(
                     #                        f"INSERT INTO {card_table} (
                     #                            min_prices, max_prices, mean_prices, foil_min_prices, foil_max_prices, foil_mean_prices, signed_min_prices, signed_max_prices, signed_mean_prices,
@@ -102,3 +100,11 @@ def compact_data(extracted_data):
         compact_result[key] = compact_result[key] / len(extracted_data)
 
     return compact_result
+
+
+def check_compacted_data(extracted_data):
+    if len(extracted_data) > 1:
+        None
+        return False
+    else:
+        return True
