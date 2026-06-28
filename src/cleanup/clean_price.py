@@ -66,7 +66,7 @@ def clean_price(card_table, time_epoch, paramether):
                     # check if there are more than one entry for the yearly time frame
                     if len(results) > 1:
                         compact_result = compact_data(results)
-                        print(compact_result)
+                        print(f"compact result: {compact_result}")
                     # mycursor.execute(f"DELETE FROM {card_table} (WHERE price_date IN (0));")
                     #                    mycursor.execute(
                     #                        f"INSERT INTO {card_table} (
@@ -91,6 +91,10 @@ def clean_price(card_table, time_epoch, paramether):
 
 
 # https://github.com/OWNER/REPOSITORY/actions/workflows/WORKFLOW-FILE/badge.svg
+"""
+Merge the entry on the extracted data from the database and return on single entry
+extracted_data: the list of data extracted from the database
+"""
 
 
 def compact_data(extracted_data):
@@ -101,12 +105,13 @@ def compact_data(extracted_data):
     map_index = 0  # index for the freshly created map that store compacted data
     temp_compact_result = {}
     for single_entry in extracted_data:
+        print(single_entry)
         # get the db entry date timestamp
         data_now = datetime.fromtimestamp(single_entry[len(single_entry) - 1])
         if first_month == 0:
             first_month = data_now.month
             month_upper_limit = get_month_upper_limit(data_now.month)
-            # print(first_month)
+            print(f"{first_month}-{month_upper_limit}")
 
         if data_now.month > month_upper_limit:
             compact_result[str(map_index)] = temp_compact_result
