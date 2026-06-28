@@ -29,15 +29,21 @@ def search_for_card(name, expansion, database_url, base_url, headers):
     blueprint_id = -1
     expansion_id = -1
     expansion_name = ""
-    find_card = True
+
+    scryfall_headers = {"User-Agent": "MagicScript/1.0 (jacopopela@Progetti)"}
+
     if expansion == None:
-        card_json = requests.get(database_url + "/cards/named?exact=" + name)
+        card_json = requests.get(
+            f"{database_url}/cards/named?exact={name}", headers=scryfall_headers
+        )
     else:
         # print("search card with expansion")
         card_json = requests.get(
-            database_url + "/cards/named?exact=" + name + "&set=" + expansion
+            f"{database_url}/cards/named?exact={name}&set={expansion}",
+            headers=scryfall_headers,
         )
     if card_json.status_code != 200:
+        print(card_json)
         logMsg.loggin_messages("...Unable to find exact card named: " + name)
 
         # TODO: search card with fuzzy finder
@@ -54,7 +60,6 @@ def search_for_card(name, expansion, database_url, base_url, headers):
         expansion_code = requests.get(base_url + "/expansions", headers=headers)
         if expansion_code.status_code != 200:
             return False
-
         logMsg.loggin_messages("...Retrived the list of expansions for " + name)
         for elem in expansion_code.json():
             if elem["code"] == card_expansion_code:
