@@ -152,6 +152,7 @@ def main(render=True):
                         )
                 except expt.InvalidTagException as ex:
                     print(ex)
+                    continue
             if render:
                 pdf.generate_pdf_report(cards_list)
 
