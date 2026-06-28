@@ -30,25 +30,34 @@ def search_for_card(name, expansion, database_url, base_url, headers):
     expansion_id = -1
     expansion_name = ""
 
+    scryfall_headers = {"User-Agent": "MagicScript/1.0 (jacopopela@Progetti)"}
+
     if expansion == None:
-        card_json = requests.get(database_url + "/cards/named?exact=" + name)
+        card_json = requests.get(
+            f"{database_url}/cards/named?exact={name}", headers=scryfall_headers
+        )
     else:
         card_json = requests.get(
-            database_url + "/cards/named?exact=" + name + "&set=" + expansion
+            f"{database_url}/cards/named?exact={name}&set={expansion}",
+            headers=scryfall_headers,
         )
     if card_json.status_code != 200:
+        print(card_json)
         logMsg.loggin_messages("...Unable to find exact card named: " + name)
 
         # TODO: search card with fuzzy finder
         card_json = requests.get(database_url + "/cards/named?fuzzy=" + name)
         if card_json.status_code != 200:
             raise expt.InternalException("unable to fetch card with name: " + name)
-
+    else:
+        print(card_json.status_code)
     # QUESTION: is the following code necessary?
     card_expansion_code = card_json.json()["set"]
     name = card_json.json()["name"]
     expansion_code = requests.get(base_url + "/expansions", headers=headers)
+
     if expansion_code.status_code != 200:
+        print(expansion_code)
         return False
 
     logMsg.loggin_messages("...Retrived the list of expansions for " + name)
