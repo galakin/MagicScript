@@ -6,9 +6,12 @@ import json
 import argparse
 import sys
 import yaml
+import sys
+import hashlib
 
 import src.priceCard as priceCard
 import src.rwCsw as rwCsw
+import src.rwmysql as rwsql
 import src.connection as nwrk
 
 import src.pdfManipulation as pdf
@@ -16,6 +19,10 @@ import src.exceptions as expt
 import global_var
 import mysql_connect
 import src.log_msg as logMsg
+
+BUF_SIZE=65536 #hasing buffer size
+md5 = hashlib.md5()
+sha1 = hashlib.sha1()
 
 base_url = "https://api.cardtrader.com/api/v2"
 game = "Magic"
@@ -113,6 +120,20 @@ def preliminary_action():
             return False
     return True
 
+def fetch_card_list():
+    with open(f"{os.getenv("HOME")}/card.csv", 'rb') as f:
+        while True:
+            data = f.read(BUF_SIZE)
+            if not data:
+                break
+            sha1.update(data)
+
+    print("SHA1: {0}".format(sha1.hexdigest()))
+    if rwsql.verify_hash(format(sha1.hexdigest())):
+        return mysql_connect.return_cards_list()
+    else:
+        #TODO: return the new found list of card
+        return mysql_connect.return_cards_list()
 
 def main(render=True):
     nwrk.verify_connection(base_url, headers)
@@ -122,7 +143,8 @@ def main(render=True):
         try:
             import mysql.connector
 
-            cards_list = mysql_connect.return_cards_list()
+
+            cards_list = fetch_card_list()
             logMsg.loggin_messages("Fetching card info...")
 
             # TODO: check csv compleatness

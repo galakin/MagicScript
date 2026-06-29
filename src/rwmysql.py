@@ -131,3 +131,7 @@ def write_to_csv(name, expansion_code, prices):
             + ");"
         )
         database.commit()
+
+
+def verify_hash(hash_code):
+    return True
