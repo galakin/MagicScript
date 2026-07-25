@@ -6,6 +6,7 @@ import mysql.connector
 
 import src.exceptions as expt
 import src.log_msg as logMsg
+import global_var as global_var
 
 
 def write_stock_csv(name, stocks, expansion_name):
@@ -134,4 +135,43 @@ def write_to_csv(name, expansion_code, prices):
 
 
 def verify_hash(hash_code):
-    return True
+    database = mysql.connector.connect(
+        host="localhost", user="root", password="cul5ai2xnsgs"
+    )
+    mycursor = database.cursor()
+    mycursor.execute("USE cards_database;")
+
+    mycursor.execute("SHOW TABLES;")
+
+    found_table = False
+    for elem in mycursor:
+        if elem[0] == global_var.collection_table_hash:
+            found_table = True
+    logMsg.loggin_messages(f"Found collection table: {found_table}")
+
+    # collection table not found, we create the table and populate it with the hash
+    if not found_table:
+        print(len(hash_code))
+        mycursor.execute(
+            "CREATE TABLE IF NOT EXISTS `"
+            + f"{global_var.collection_table_hash}`"
+            + f"(hash_code varchar({len(hash_code)}));"
+        )
+        database.commit()
+        mycursor.execute(
+            "INSERT INTO "
+            + f"{global_var.collection_table_hash}"
+            + f'(hash_code) VALUES ("{hash_code}");'
+        )
+        database.commit()
+        return False
+    # found the table that store che yaml collection hash code
+    else:
+        mycursor.execute("SELECT * FROM " + f"{global_var.collection_table_hash};")
+        if len(elem) > 1:
+            raise Exception("Found more the one hash code for the hash table")
+        for elem in mycursor:
+            if elem[0] == hash_code:
+                return True
+            else:
+                return False
