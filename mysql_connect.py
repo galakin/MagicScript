@@ -82,6 +82,7 @@ def populate_database():
             csvreader = csv.reader(csvfile)
             first_row = True
             for row in csvreader:
+                print(row)
                 if first_row == True:
                     first_row = False
                 else:
@@ -131,3 +132,16 @@ def return_cards_list():
     for elem in mycursor:
         return_list.append(elem)
     return return_list
+
+
+def update_card_info():
+    database = mysql.connector.connect(
+        host="localhost", user="root", password="cul5ai2xnsgs"
+    )
+
+    mycursor = database.cursor()
+    mycursor.execute("USE cards_database;")
+    mycursor.execute("DELETE FROM card_info;")
+    database.commit()
+    populate_database()
+    return True
