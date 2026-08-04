@@ -1,0 +1,103 @@
+import requests
+import os
+import pathlib
+import pandas  # TODO: change import location
+import json
+
+import src.priceCard as priceCard
+import src.rwmysql as rwmysql
+import src.exceptions as expt
+import src.stocks as stocks
+import src.log_msg as logMsg
+import mysql_connect
+
+
+def verify_connection(base_url, headers):
+    ##Fetch game info
+    response = requests.get(base_url + "/info", headers=headers)
+    if response.status_code == 200:
+        logMsg.loggin_messages("...Connection Established!\n")
+        return True
+    else:
+        logMsg.loggin_messages(response)
+        raise expt.InternalException(
+            "Unable to connect to CardTrader API server\nCheck if your API token is still valid!"
+        )
+
+
+def search_for_card(name, expansion, database_url, base_url, headers):
+    blueprint_id = -1
+    expansion_id = -1
+    expansion_name = ""
+
+    scryfall_headers = {"User-Agent": "MagicScript/1.0 (jacopopela@Progetti)"}
+
+    if expansion == None:
+        card_json = requests.get(
+            f"{database_url}/cards/named?exact={name}", headers=scryfall_headers
+        )
+    else:
+        card_json = requests.get(
+            f"{database_url}/cards/named?exact={name}&set={expansion}",
+            headers=scryfall_headers,
+        )
+    if card_json.status_code != 200:
+        print(card_json)
+        logMsg.loggin_messages("...Unable to find exact card named: " + name)
+
+        # TODO: search card with fuzzy finder
+        card_json = requests.get(database_url + "/cards/named?fuzzy=" + name)
+        if card_json.status_code != 200:
+            raise expt.InternalException("unable to fetch card with name: " + name)
+    else:
+        print(card_json.status_code)
+    # QUESTION: is the following code necessary?
+    card_expansion_code = card_json.json()["set"]
+    name = card_json.json()["name"]
+    expansion_code = requests.get(base_url + "/expansions", headers=headers)
+
+    if expansion_code.status_code != 200:
+        print(expansion_code)
+        return False
+
+    logMsg.loggin_messages("...Retrived the list of expansions for " + name)
+    for elem in expansion_code.json():
+        if elem["code"] == card_expansion_code:
+            if expansion_id > 0:
+                exit()
+            expansion_id = elem["id"]
+            expansion_name = elem["code"]
+            logMsg.loggin_messages("...Card code found!")
+
+    # retrive card blueprint
+    card_blueprint = requests.get(
+        base_url + "/blueprints/export?expansion_id=" + str(expansion_id),
+        headers=headers,
+    )
+    if card_blueprint.status_code != 200:
+        raise expt.InternalException("unable to fetch expensions card")
+
+    for elem in card_blueprint.json():
+        # print(elem["name"])
+        if elem["name"] == name:
+            if blueprint_id > 0:
+                raise expt.InternalException("two product with the same name found")
+            blueprint_id = elem["id"]
+
+    selled_cards = requests.get(
+        base_url + "/marketplace/products?blueprint_id=" + str(blueprint_id),
+        headers=headers,
+    )
+
+    tst = list(selled_cards.json().keys())
+    logMsg.loggin_messages("...fetching prices info")
+    if tst[0] != "-1":
+        card_price = priceCard.get_prices(selled_cards.json(), tst[0])
+        stocks.finds_stocks(selled_cards.json(), blueprint_id, expansion_name)
+        rwmysql.write_to_csv(name, expansion_name, card_price)
+        return True
+    else:
+        raise expt.InvalidTagException(
+            "Unable to find item with elem_id=", blueprint_id
+        )
+        return False
