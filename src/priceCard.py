@@ -28,8 +28,12 @@ def get_prices(seller_list, item_tag):
             "min_price": default_list[0]["price_cents"] / 100,
             "max_price": default_list[len(default_list) - 1]["price_cents"] / 100,
             "mean_price": mean_price,
-            "foil_min_price": foil_list[0]["price_cents"] / 100,
-            "foil_max_price": foil_list[len(foil_list) - 1]["price_cents"] / 100,
+            "foil_min_price": foil_list[0]["price_cents"] / 100
+            if len(foil_list) > 0
+            else 0,
+            "foil_max_price": foil_list[len(foil_list) - 1]["price_cents"] / 100
+            if len(foil_list) > 0
+            else 0,
             "signed_min_price": signed_list[0]["price_cents"] / 100
             if len(signed_list) > 0
             else 0,
@@ -46,10 +50,12 @@ def get_prices(seller_list, item_tag):
         }
 
         # Calculate foil mean price
+
         mean_price = 0
-        for elem in foil_list:
-            mean_price += elem["price_cents"] / 100
-        mean_price = mean_price / len(foil_list)
+        if len(foil_list) > 0:
+            for elem in foil_list:
+                mean_price += elem["price_cents"] / 100
+            mean_price = mean_price / len(foil_list)
         tmp_map["foil_mean_price"] = mean_price
 
         # Calculate signed mean price

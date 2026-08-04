@@ -20,7 +20,7 @@ import global_var
 import mysql_connect
 import src.log_msg as logMsg
 
-BUF_SIZE=65536 #hasing buffer size
+BUF_SIZE = 65536  # hasing buffer size
 md5 = hashlib.md5()
 sha1 = hashlib.sha1()
 
@@ -120,20 +120,22 @@ def preliminary_action():
             return False
     return True
 
+
 def fetch_card_list():
-    with open(f"{os.getenv("HOME")}/card.csv", 'rb') as f:
-        while True:
-            data = f.read(BUF_SIZE)
-            if not data:
-                break
-            sha1.update(data)
+
+    with open(f"{os.getenv('HOME')}/card.csv", "r") as f:
+        data = f.read(BUF_SIZE)
+        sha1.update(data.encode("utf-8"))
 
     print("SHA1: {0}".format(sha1.hexdigest()))
     if rwsql.verify_hash(format(sha1.hexdigest())):
+        logMsg.loggin_messages("No need to update internal collection")
         return mysql_connect.return_cards_list()
     else:
-        #TODO: return the new found list of card
+        logMsg.loggin_messages("Found change on the internal collection...updating DB")
+        mysql_connect.update_card_info()
         return mysql_connect.return_cards_list()
+
 
 def main(render=True):
     nwrk.verify_connection(base_url, headers)
@@ -142,7 +144,6 @@ def main(render=True):
         logMsg.loggin_messages("finished prelim action")
         try:
             import mysql.connector
-
 
             cards_list = fetch_card_list()
             logMsg.loggin_messages("Fetching card info...")
