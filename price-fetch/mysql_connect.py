@@ -12,7 +12,6 @@ import src.priceCard as priceCard
 import src.rwCsw as rwCsw
 import src.connection as nwrk
 
-import src.pdfManipulation as pdf
 import src.exceptions as expt
 import src.log_msg as logMsg
 import global_var
