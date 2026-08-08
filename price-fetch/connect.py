@@ -127,7 +127,6 @@ def fetch_card_list():
         data = f.read(BUF_SIZE)
         sha1.update(data.encode("utf-8"))
 
-    print("SHA1: {0}".format(sha1.hexdigest()))
     if rwsql.verify_hash(format(sha1.hexdigest())):
         logMsg.loggin_messages("No need to update internal collection")
         return mysql_connect.return_cards_list()
