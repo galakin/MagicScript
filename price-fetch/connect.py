@@ -137,7 +137,7 @@ def fetch_card_list():
         return mysql_connect.return_cards_list()
 
 
-def main(render=True):
+def main():
     nwrk.verify_connection(base_url, headers)
     result = preliminary_action()
     if result:
@@ -169,8 +169,8 @@ def main(render=True):
                         )
                 except expt.InvalidTagException as ex:
                     print(ex)
-            if render:
-                pdf.generate_pdf_report(cards_list)
+            # if render:
+            #    pdf.generate_pdf_report(cards_list)
 
         except expt.InternalException as ex:
             print("unexpected error")

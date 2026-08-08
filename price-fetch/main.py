@@ -155,7 +155,6 @@ def config_script():
 
 
 if __name__ == "__main__":
-    render = True
     ext_env = sys.argv
     # print("env vars: "+str(ext_env))
 
@@ -177,8 +176,3 @@ if __name__ == "__main__":
         print("Configurate Magic Script")
         config_script()
         exit()
-
-    elif any(item in sys.argv for item in sys.argv if item == "--quiet"):
-        render = False
-        if check_config():
-            connect.main(render)
