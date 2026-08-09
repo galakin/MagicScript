@@ -14,12 +14,12 @@ import src.connection as nwrk
 
 import src.exceptions as expt
 import src.log_msg as logMsg
-import global_var
+import global_var as gv
 
 
 def fetch_local_card_data():
     database = mysql.connector.connect(
-        host="localhost", user="root", password="cul5ai2xnsgs"
+        host=gv.DB_HOST, user=gv.DB_USER, password=gv.DB_PASSWORD
     )
 
     mycursor = database.cursor()
@@ -27,7 +27,7 @@ def fetch_local_card_data():
 
     find_db = False
     for elem in mycursor:
-        if elem[0] == "cards_database":
+        if elem[0] == gv.DB_NAME:
             find_db = True
     if find_db:
         logMsg.loggin_messages("...cards db found")
@@ -63,7 +63,7 @@ def populate_database():
     import csv
 
     database = mysql.connector.connect(
-        host="localhost", user="root", password="cul5ai2xnsgs"
+        host=gv.DB_HOST, user=gv.DB_USER, password=gv.DB_PASSWORD
     )
 
     mycursor = database.cursor()

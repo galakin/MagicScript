@@ -14,7 +14,6 @@ import src.rwCsw as rwCsw
 import src.rwmysql as rwsql
 import src.connection as nwrk
 
-import src.pdfManipulation as pdf
 import src.exceptions as expt
 import global_var
 import mysql_connect
@@ -93,6 +92,8 @@ def preliminary_action():
                 except yaml.YAMLError as e:
                     logMsg.loggin_messages(f"{e}")
     found_game = False
+    # set mysql env vars
+    set_mysql_env()
 
     # check for the csv storage method [archived]
     if global_var.storage_method == "csv":
@@ -136,6 +137,20 @@ def fetch_card_list():
         return mysql_connect.return_cards_list()
 
 
+def set_mysql_env():
+    logMsg.loggin_messages("retrieve database information from env vars")
+    if os.getenv("DB_USER") != None:
+        global_var.DB_USER = os.getenv("DB_USER")
+    if os.getenv("DB_PASSWORD") != None:
+        global_var.DB_PASSWORD = os.getenv("DB_PASSWORD")
+    # DB_NAME
+    if os.getenv("DB_NAME") != None:
+        global_var.DB_NAME = os.getenv("DB_NAME")
+    # DB_HOST
+    if os.getenv("DB_HOST") != None:
+        global_var.DB_HOST = os.getenv("DB_NAME")
+
+
 def main():
     nwrk.verify_connection(base_url, headers)
     result = preliminary_action()
@@ -147,7 +162,6 @@ def main():
             cards_list = fetch_card_list()
             logMsg.loggin_messages("Fetching card info...")
 
-            # TODO: check csv compleatness
             for elem in cards_list:
                 try:
                     if elem[1] != None:

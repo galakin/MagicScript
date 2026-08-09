@@ -7,6 +7,9 @@ Scryfall API are used to fetch the card information such as card code, edition, 
 
 CardTrader API are used to fetch the card prices, availability an stock statistic
 
+## Prerequisite
+A runngin mysql database, the application is tested with MySQL `v26.7.0`
+
 ## Install
 Run a `pip install -r requirements.txt` command inside the main folder to install all the required library.
 
