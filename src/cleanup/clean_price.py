@@ -22,6 +22,9 @@ import src.cleanup.retrieve_db_credential as retrieveCredentials
     paramethers: if the cleanup need to be done on a yearly, monthly or weekly base
 """
 
+# timefra for GEN-MAR APR-JUN JUL-SET OCT-DEC
+# TIMEFRAME = {(1, 3), (4, 6), (7, 9), (10, 12)}
+
 
 def clean_price(card_table, time_epoch, paramether):
     creds = retrieveCredentials.retrieve_credentials("", "")
@@ -39,11 +42,14 @@ def clean_price(card_table, time_epoch, paramether):
                     f"SELECT * FROM {card_table} WHERE price_date < {time_epoch};"
                 )
 
+                # fetch all data over the past yeat
                 results = mycursor.fetchall()
+
                 sorted_result = sorted(results, key=lambda x: x[12])
                 bottom_end_epoch = sorted_result[0][12]
-
                 init_mont = 0
+
+                # get all the data from 1 year ago to the start of the fetched data
                 target_date = datetime(
                     datetime.now().year - 1, datetime.now().month, datetime.now().day
                 )
@@ -57,13 +63,11 @@ def clean_price(card_table, time_epoch, paramether):
                     )
                     results = mycursor.fetchall()
                     # print(results)
-                    compact_result = compact_data(results)
-                    print(len(compact_result))
-                    #                    mycursor.execute(
-                    #                        f"DELETE FROM {card_table} (
-                    #                            WHERE price_date IN (0)
-                    #                        );"
-                    #                    )
+                    # check if there are more than one entry for the yearly time frame
+                    if len(results) > 1:
+                        compact_result = compact_data(results)
+                        print(f"compact result: {compact_result}")
+                    # mycursor.execute(f"DELETE FROM {card_table} (WHERE price_date IN (0));")
                     #                    mycursor.execute(
                     #                        f"INSERT INTO {card_table} (
                     #                            min_prices, max_prices, mean_prices, foil_min_prices, foil_max_prices, foil_mean_prices, signed_min_prices, signed_max_prices, signed_mean_prices,
@@ -87,18 +91,63 @@ def clean_price(card_table, time_epoch, paramether):
 
 
 # https://github.com/OWNER/REPOSITORY/actions/workflows/WORKFLOW-FILE/badge.svg
+"""
+Merge the entry on the extracted data from the database and return on single entry
+extracted_data: the list of data extracted from the database
+"""
 
 
 def compact_data(extracted_data):
     compact_result = {}
+
+    first_month = 0  # check if it's the start of a new 3 month windows
+    month_upper_limit = 0  # the month where the next 3 month windows trigger
+    map_index = 0  # index for the freshly created map that store compacted data
+    temp_compact_result = {}
     for single_entry in extracted_data:
+        print(single_entry)
+        # get the db entry date timestamp
+        data_now = datetime.fromtimestamp(single_entry[len(single_entry) - 1])
+        if first_month == 0:
+            first_month = data_now.month
+            month_upper_limit = get_month_upper_limit(data_now.month)
+            print(f"{first_month}-{month_upper_limit}")
+
+        if data_now.month > month_upper_limit:
+            compact_result[str(map_index)] = temp_compact_result
+            temp_compact_result = {}
+            first_month = data_now.month
+            month_upper_limit = get_month_upper_limit(data_now.month)
+            map_index += 1
+
+        # print(data_now.month)
+        # print(single_entry[len(single_entry) - 1])
+
         for index in range(len(single_entry)):
             if str(index) not in compact_result:
-                compact_result[str(index)] = single_entry[index]
+                temp_compact_result[str(index)] = single_entry[index]
 
             else:
-                compact_result[str(index)] += single_entry[index]
-    for key in compact_result:
-        compact_result[key] = compact_result[key] / len(extracted_data)
+                temp_compact_result[str(index)] += single_entry[index]
+    # for key in compact_result:
+    #    compact_result[key] = compact_result[key] / len(extracted_data)
 
     return compact_result
+
+
+"""
+return the month upper limit for the current month following the schema
+specified in the project issue
+current_month: the current month for the analyzed entry
+"""
+
+
+def get_month_upper_limit(current_month):
+    if current_month <= 3:
+        return 3
+    elif current_month > 3 and current_month <= 6:
+        return 6
+    elif current_month > 6 and current_month <= 9:
+        return 9
+    else:  # current_month > 9
+        return 12
