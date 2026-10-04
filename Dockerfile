@@ -1,5 +1,7 @@
 FROM python:3.13.13
 
+
+
 RUN useradd -m magic-script
 
 COPY price-fetch /home/magic-script
