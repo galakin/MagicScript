@@ -121,56 +121,18 @@ def preliminary_action():
     return True
 
 
-def fetch_card_list():
-
-    with open(f"{os.getenv('HOME')}/card.csv", "r") as f:
-        data = f.read(BUF_SIZE)
-        sha1.update(data.encode("utf-8"))
-
-    print("SHA1: {0}".format(sha1.hexdigest()))
-    if rwsql.verify_hash(format(sha1.hexdigest())):
-        logMsg.loggin_messages("No need to update internal collection")
-        return mysql_connect.return_cards_list()
-    else:
-        logMsg.loggin_messages("Found change on the internal collection...updating DB")
-        mysql_connect.update_card_info()
-        return mysql_connect.return_cards_list()
-
-
-def main(render=True):
-    nwrk.verify_connection(base_url, headers)
+def main():
+    # nwrk.verify_connection(base_url, headers)
     result = preliminary_action()
     if result:
         logMsg.loggin_messages("finished prelim action")
         try:
             import mysql.connector
 
-            cards_list = fetch_card_list()
+            cards_list = mysql_connect.return_cards_list()
             logMsg.loggin_messages("Fetching card info...")
 
-            # TODO: check csv compleatness
-            for elem in cards_list:
-                try:
-                    if elem[1] != None:
-                        nwrk.search_for_card(
-                            elem[0],
-                            elem[1],
-                            database_url,
-                            base_url,
-                            headers,
-                        )
-                    else:
-                        nwrk.search_for_card(
-                            elem[0],
-                            None,
-                            database_url,
-                            base_url,
-                            headers,
-                        )
-                except expt.InvalidTagException as ex:
-                    print(ex)
-            if render:
-                pdf.generate_pdf_report(cards_list)
+            pdf.generate_pdf_report(cards_list)
 
         except expt.InternalException as ex:
             print("unexpected error")
