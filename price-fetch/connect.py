@@ -14,7 +14,6 @@ import src.rwCsw as rwCsw
 import src.rwmysql as rwsql
 import src.connection as nwrk
 
-import src.pdfManipulation as pdf
 import src.exceptions as expt
 import global_var
 import mysql_connect
